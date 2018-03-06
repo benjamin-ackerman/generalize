@@ -11,7 +11,11 @@
       # Tipton generalizability index
       # Kolmogorov-Smirnov?
       # others?
-# 4: Generalize results using
+# 4: Create plots (?)
+      # Covariate difference b/w trial and population pre-and-post weighting
+      # Plot trial participation probabilities
+      # Plot SATE and TATE, show difference between the two
+# 5: Generalize results using
       # Weighting by the odds
       # Weighting by the inverse probability (?)
       # BART
