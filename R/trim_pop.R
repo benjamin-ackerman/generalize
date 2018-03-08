@@ -1,5 +1,10 @@
 ### This function works when you have a stacked data set, trial and population, with an indicator variable "trial"
 
+## S: binary sample membership variable (1 = trial, 0 = population/not in trial)
+## X: vector, matrix or dataframe containing baseline covariates
+## data: if specified, can just list S and X variable names?
+## just_population: logical - TRUE: spit out just the population data, FALSE: spit out full data (false = default)
+
 trim_pop <- function(data){
     trim_dat = data
     trim_dat$row.names = row.names(trim_dat)
