@@ -1,9 +1,9 @@
 ### This function works when you have a stacked data set, trial and population, with an indicator variable "trial"
 ## formula: formula specifying trial membership variable and covariates used to adjust
-## data: if specified, can just list S and X variable names?
+## data: must be a data frame
 ## just_population: logical - TRUE: spit out just the population data, FALSE: spit out full data (false = default)
 
-trim_pop <- function(formula, data){
+trim_pop <- function(formula, data, just_population = FALSE){
   trial_membership = all.vars(formula[[2]])
   covariates = all.vars(formula[[3]])
 
@@ -34,5 +34,12 @@ trim_pop <- function(formula, data){
 
   missing_rows=unique(unlist(bound_violations))
 
-  return(data[which(!rownames(data) %in% missing_rows),])
+  trimmed_data = data[which(!rownames(data) %in% missing_rows),]
+
+  if(just_population == TRUE){
+    return(trimmed_data[which(trimmed_data[,trial_membership] == 0),])
+  }
+  if(just_population == FALSE){
+    return(trimmed_data)
+  }
 }
