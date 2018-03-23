@@ -4,14 +4,18 @@
 ## just_population: logical - TRUE: spit out just the population data, FALSE: spit out full data (false = default)
 
 trim_pop <- function(formula, data){
-  trial_membership = all.vars(formula)[1]
-  covariates = all.vars(formula)[-1]
+  trial_membership = all.vars(formula[[2]])
+  covariates = all.vars(formula[[3]])
 
   if(anyNA(match(names(table(data[,trial_membership])),c("0","1")))){
     stop("Sample Membership variable must be coded as `0` (not in trial) or `1` (in trial)",call. = FALSE)
   }
 
   trial_dat = data[which(data[,trial_membership]==1),covariates]
+  if(length(covariates)==1){
+    trial_dat = data.frame(trial_dat)
+    names(trial_dat) = covariates
+    }
 
   covariate_bounds = function(covariate){
     if(is.factor(trial_dat[,covariate])){
