@@ -1,32 +1,34 @@
 ### This function works when you have a stacked data set, trial and population, with an indicator variable "trial"
-
-## S: binary sample membership variable (1 = trial, 0 = population/not in trial)
-## X: vector, matrix or dataframe containing baseline covariates
+## formula: formula specifying trial membership variable and covariates used to adjust
 ## data: if specified, can just list S and X variable names?
 ## just_population: logical - TRUE: spit out just the population data, FALSE: spit out full data (false = default)
 
-trim_pop <- function(data){
-    trim_dat = data
-    trim_dat$row.names = row.names(trim_dat)
+trim_pop <- function(formula, data){
+  trial_membership = all.vars(formula)[1]
+  covariates = all.vars(formula)[-1]
 
-    trial_dat = trim_dat[which(trim_dat$trial == 1),covariates]
+  if(anyNA(match(names(table(data[,trial_membership])),c("0","1")))){
+    stop("Sample Membership variable must be coded as `0` (not in trial) or `1` (in trial)",call. = FALSE)
+  }
 
-    covariate_bounds = function(covariate){
-      if(is.factor(trial_dat[,covariate])){
-        return(levels(droplevels(trial_dat)[,covariate]))
-      }
-      if(is.numeric(trial_dat[,covariate])){
-        return(c(min(trial_dat[,covariate],na.rm=TRUE),max(trial_dat[,covariate],na.rm=TRUE)))
-      }
-    }
-    trial_levels = map(covariates,covariate_bounds)
-    names(trial_levels) = covariates
+  trial_dat = data[which(data[,trial_membership]==1),covariates]
 
-    missing_factors=list()
-    for(i in names(trial_dat)){
-      missing_factors[[which(names(trial_dat)==i)]] = trim_dat[which(!trim_dat[,i] %in% trial_levels[[i]]),"row.names"]
+  covariate_bounds = function(covariate){
+    if(is.factor(trial_dat[,covariate])){
+
+      trial_levels = levels(droplevels(trial_dat)[,covariate])
+      return(rownames(trim_dat)[which(!trim_dat[,covariate] %in% trial_levels)])
     }
 
-    missing_rows=unique(unlist(missing_factors))
-    trim_dat[which(!trim_dat$row.names %in% missing_rows),]
+    if(is.numeric(trial_dat[,covariate])){
+      trial_bounds = c(min(trial_dat[,covariate],na.rm=TRUE),max(trial_dat[,covariate],na.rm=TRUE))
+      return(rownames(data)[which(!(data[,covariate] >= trial_bounds[1] & data[,covariate] <= trial_bounds[2]))])
+    }
+  }
+
+  bound_violations = purrr::map(covariates,covariate_bounds)
+
+  missing_rows=unique(unlist(bound_violations))
+
+  return(data[which(!rownames(data) %in% missing_rows),])
 }
