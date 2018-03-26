@@ -37,7 +37,7 @@ trim_pop <- function(formula, data, just_population = FALSE){
     if(is.factor(trial_dat[,covariate])){
 
       trial_levels = levels(droplevels(trial_dat)[,covariate])
-      return(rownames(trim_dat)[which(!trim_dat[,covariate] %in% trial_levels)])
+      return(rownames(data)[which(!data[,covariate] %in% trial_levels)])
     }
 
     if(is.numeric(trial_dat[,covariate])){
