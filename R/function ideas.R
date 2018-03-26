@@ -17,7 +17,6 @@
       # Plot SATE and TATE, show difference between the two
 # 5: Generalize results using
       # Weighting by the odds
-      # Weighting by the inverse probability (?)
       # BART
       # TMLE
 
