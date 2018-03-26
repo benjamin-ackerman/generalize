@@ -61,6 +61,3 @@ gen_weights = function(formula, data, method = "lr"){
 }
 
 
-
-gen_weights(trial ~ AGE + GENDER + RACE + HISPANIC, data = dat)
-
