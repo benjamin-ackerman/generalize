@@ -11,6 +11,10 @@ gen_weights = function(formula, data, method = "lr"){
   #   #stop("Data must be specified.", call. = FALSE)
   # }
 
+  if(class(formula) != "formula"){
+    stop("Must enter a valid formula!",call. = FALSE)
+  }
+
   if (!is.data.frame(data)) {
     stop("Data must be a data.frame.", call. = FALSE)}
 

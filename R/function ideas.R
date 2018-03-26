@@ -11,7 +11,7 @@
       # Tipton generalizability index
       # Kolmogorov-Smirnov?
       # others?
-# 4: Create plots (?)
+# 4: Create plots (?) or at least covariate tables?
       # Covariate difference b/w trial and population pre-and-post weighting
       # Plot trial participation probabilities
       # Plot SATE and TATE, show difference between the two
