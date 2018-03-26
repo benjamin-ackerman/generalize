@@ -10,26 +10,95 @@
 
 
 
-generalize <- function(Y, A, S, X, method){
-  #data = data.frame(Y,A,S,X,stringsAsFactors = FALSE)
+generalize <- function(data, outcome, treatment, selection.formula, method = c("weighting","BART","TMLE"), weight_method = "lr",outcome.formula = NULL){
 
-  if(tolower(method) == "weighting" & tolower(weighting_method) %in% c(NULL,"lr")){
-
-
+  if (!is.data.frame(data)) {
+    stop("Data must be a data.frame.", call. = FALSE)
   }
 
 
+  if(anyNA(match(outcome,names(data)))){
+    stop("Outcome is not a variable in the data provided!",call. = FALSE)
+  }
+
+  if(anyNA(match(treatment,names(data)))){
+    stop("Treatment is not a variable in the data provided!",call. = FALSE)
+  }
+
+  if(class(selection.formula) != "formula" | (!is.null(outcome.formula) & class(outcome.formula) != "formula")){
+    stop("Must enter a valid formula!",call. = FALSE)
+  }
+
+
+  if(anyNA(match(all.vars(selection.formula),names(data)))){
+    missing_variables = all.vars(selection.formula)[is.na(match(all.vars(selection.formula),names(data)))]
+    stop(paste0(paste(missing_variables,collapse = ", ")," are not variables in the data provided"))
+  }
+
+  if(!is.null(outcome.formula) & anyNA(match(all.vars(outcome.formula),names(data)))){
+    missing_variables = all.vars(outcome.formula)[is.na(match(all.vars(outcome.formula),names(data)))]
+    stop(paste0(paste(missing_variables,collapse = ", ")," are not variables in the data provided"))
+  }
+
+  trial_membership = all.vars(selection.formula)[1]
+  covariates = all.vars(selection.formula)[-1]
+
+  if(!length(unique(data[,trial_membership])) == 2){
+    stop("Trial Membership variable not binary", call. = FALSE)
+  }
+
+  ##### just keep the data we need #####
+  data= data[rownames(na.omit(data[,all.vars(selection.formula)])),c(outcome, treatment, all.vars(selection.formula))]
+
+
+  ##### generalize!!!
+
+  ##### Weighting Methods #####
+  if(method == "weighting"){
+    data$weights = gen_weights(selection.formula, data = data, method = weight_method)$weights
+
+    if(is.null(outcome.formula)){
+      TATE_model = lm(as.formula(paste(outcome,treatment,sep="~")),data = data, weights = weights)
+    }
+
+    if(!is.null(outcome.formula)){
+      TATE_model = lm(outcome.formula, data = data, weights = weights)
+    }
+
+    TATE = summary(TATE_model)$coefficients[treatment,"Estimate"]
+    TATE_se = summary(TATE_model)$coefficients[treatment,"Std. Error"]
+
+    results = list(TATE = TATE, TATE_CI = c(TATE - 1.96*TATE_se, TATE + 1.96*TATE_se))
+
+    if(dim(table(data[,outcome])) == 2){
+      if(is.null(outcome.formula)){
+        TATE_OR_model = glm(as.formula(paste(outcome,treatment,sep="~")),data = data, weights = weights,family='quasibinomial')
+      }
+
+      if(!is.null(outcome.formula)){
+        TATE_OR_model = glm(outcome.formula, data = data, weights = weights,family='quasibinomial')
+      }
+
+      TATE_logOR = summary(TATE_model)$coefficients[treatment,"Estimate"]
+      TATE_logOR_se = summary(TATE_model)$coefficients[treatment,"Std. Error"]
+
+      results = list(TATE = TATE, TATE_CI = c(TATE - 1.96*TATE_se, TATE + 1.96*TATE_se), TATE_OR = exp(TATE_logOR), TATE_OR_CI = c(exp(TATE_logOR - 1.96*TATE_logOR_se),exp(TATE_logOR + 1.96*TATE_logOR_se)))
+    }
+  }
+
+  if(method == "BART"){
+    results = "NOT READY YET"
+  }
+
+  if(method == "TMLE"){
+    results = "NOT READY YET"
+  }
+
+  return(results)
 }
 
 
-### read in: formula, data, method of weighting,
-trial ~ x1 + x2 + x3 + ... + x4
-
-
-formula = as.formula(study ~ x1 + x3 + x2*x4)
-all.vars(formula)
-
-
+#########################################################################################################################
 
 
 results = function(outcome){

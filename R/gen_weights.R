@@ -29,7 +29,7 @@ gen_weights = function(formula, data, method = "lr"){
 
 
   ### Clean up data from missing values ###
-  data = na.omit(data[,all.vars(formula)])
+  data = data[rownames(na.omit(data[,all.vars(formula)])),]
 
   ### Logistic Regression
 
@@ -56,7 +56,8 @@ gen_weights = function(formula, data, method = "lr"){
   participation_probs = list(probs_population = ps[which(data[,trial_membership]==0)],
                      probs_trial = ps[which(data[,trial_membership]==0)])
 
-  return(participation_probs)
+  return(list(participation_probs = participation_probs,
+              weights = weights))
 }
 
 
