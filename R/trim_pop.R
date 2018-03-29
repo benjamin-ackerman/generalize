@@ -1,9 +1,11 @@
-### This function works when you have a stacked data set, trial and population, with an indicator variable "trial"
-## formula: formula specifying trial membership variable and covariates used to adjust
-## data: must be a data frame
-## just_population: logical - TRUE: spit out just the population data, FALSE: spit out full data (false = default)
-
-##### packages required: purrr #####
+#' Trim target population covariates to be within bounds of trial
+#'
+#' @param formula an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.
+#' @param data a data frame containing the variables specified in the model
+#' @param just_population logical. if FALSE (default), function returns full data set, if TRUE, function only returns trimmed population data.
+#' @return \code{trim_pop} returns a data frame, where the target population covariates do not exceed the bounds of the trial covariates
+#' @examples
+#' trim_pop(trial ~ age + sex + race, data = ctn_data)
 
 trim_pop <- function(formula, data, just_population = FALSE){
 

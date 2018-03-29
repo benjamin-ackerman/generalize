@@ -1,15 +1,19 @@
-# outcome: name of outcome variable
-# treatment: name of treatment variable
-# selection_formula: probability of trial participation formula
-#
+#' Estimate weights for generalizing ATE by predicting probability of trial participation
+#'
+#' @param outcome variable denoting outcome
+#' @param treatment variable denoting binary treatment assignment (ok if only available in trial, not population)
+#' @param selection_formula an object of class "formula." The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.
+#' @param data a data frame containing the variables specified in the model
+#' @param method choose method to generalize average treatment effect.  Default is "weighting" (weighting by the odds of participation probability).  Other methods supported are "bart" (Bayesian Additive Regression Trees - NOT READY YET) and "tmle" (Targeted Maximum Likelihood Estimation)
+#' @param weight_method choose method to predict the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are random forests ("rf") and lasso ("lasso")
+#' @param outcome_formula an object of class "formula." Can specify an optional outcome model to include pre-treatment covariates.
+#' @return \code{generalize} returns an object of the class "generalize", containing the following: \code{TATE} (target population average treatment effect), \code{TATE_CI} (95% Confidence Interval for TATE).  If outcome is binary, reports TATE as risk difference as well as odds ratio, with accompanying CIs
+#' @examples
+#' generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "weighting")
+#' generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "tmle")
 
-# method: c("weighting","bart","tmle")
-# weighting_method: c("lr","rf","lasso","sl")
 
-##### package dependencies: tmle
-
-
-generalize <- function(outcome, treatment, selection_formula, data, method, weight_method = "lr",outcome_formula = NULL){
+generalize <- function(outcome, treatment, selection_formula, data, method = "weighting", weight_method = "lr",outcome_formula = NULL){
 
   if (!is.data.frame(data)) {
     stop("Data must be a data.frame.", call. = FALSE)

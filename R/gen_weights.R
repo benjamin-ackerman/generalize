@@ -1,3 +1,13 @@
+#' Estimate weights for generalizing ATE by predicting probability of trial participation
+#'
+#' @param formula an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.
+#' @param data a data frame containing the variables specified in the model
+#' @param method choose method to predict the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are random forests ("rf") and lasso ("lasso")
+#' @return \code{gen_weights} returns an object of the class "gen_weights", containing the following: \code{participation_probs} (predicted probabilities of trial participation), \code{weights} (weights constructed from predicted probabilities - see description for more details), \code{gen_index} (generalizability index)
+#' @examples
+#' gen_weights(trial ~ age + sex + race, data = ctn_data)
+#' gen_weights(trial ~ age + sex + race, data = ctn_data, method = 'rf')
+
 gen_weights = function(formula, data, method = "lr"){
 
   ### Get variable names from the formula ###
@@ -20,7 +30,7 @@ gen_weights = function(formula, data, method = "lr"){
 
   if(anyNA(match(all.vars(formula),names(data)))){
     missing_variables = all.vars(formula)[is.na(match(all.vars(formula),names(data)))]
-    stop(paste0(paste(missing_variables,collapse = ", ")," are not variables in the data provided"))
+    stop(paste0(paste(missing_variables,collapse = ", ")," not in the data provided"))
   }
 
   if(!length(unique(data[,trial_membership])) == 2){
@@ -39,13 +49,13 @@ gen_weights = function(formula, data, method = "lr"){
 
   if(method == "rf"){
     formula = as.formula(paste0("as.factor(",trial_membership,") ~ ",as.character(formula)[3]))
-    ps = predict(randomForest(formula, data=data, na.action=na.omit, sampsize = 454, ntree=1500),type = 'prob')[,2]
+    ps = predict(randomForest::randomForest(formula, data=data, na.action=na.omit, sampsize = 454, ntree=1500),type = 'prob')[,2]
   }
 
   if(method == "lasso"){
-    test.x = model.matrix(~ -1 + ., data=data %>% select(covariates))
+    test.x = model.matrix(~ -1 + ., data=data[,covariates])
     test.y = data[,trial_membership]
-    ps = as.numeric(predict(cv.glmnet(
+    ps = as.numeric(predict(glmnet::cv.glmnet(
       x=test.x,
       y=test.y,
       family="binomial"
@@ -56,8 +66,13 @@ gen_weights = function(formula, data, method = "lr"){
   participation_probs = list(probs_population = ps[which(data[,trial_membership]==0)],
                      probs_trial = ps[which(data[,trial_membership]==0)])
 
-  return(list(participation_probs = participation_probs,
-              weights = weights))
+  out = list(
+    participation_probs = participation_probs,
+    weights = weights,
+    gen_index = gen_index(participation_probs$probs_population, participation_probs$probs_trial)
+  )
+
+  return(out)
 }
 
 
