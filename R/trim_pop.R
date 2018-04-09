@@ -1,3 +1,6 @@
+## Output: something that documents how many excluded, summarizes the "table 1" of covariate means for included/excluded
+## Continuous variables: allow for some amount of "wiggle room" - threshold is not min or max
+
 #' Trim target population covariates to be within bounds of trial
 #'
 #' @param formula an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.
@@ -54,12 +57,18 @@ trim_pop <- function(formula, data, just_population = FALSE){
 
   trimmed_data = data[which(!rownames(data) %in% missing_rows),]
 
+  n_excluded = nrow(data) - nrow(trimmed_data)
+
   if(just_population == TRUE){
-    return(trimmed_data[which(trimmed_data[,trial_membership] == 0),])
+    return(list(n_excluded = n_excluded,
+                trimmed_data = trimmed_data[which(trimmed_data[,trial_membership] == 0),],
+                full_data = data))
   }
 
   if(just_population == FALSE){
-    return(trimmed_data)
+    return(list(n_excluded = n_excluded,
+                trimmed_data = trimmed_data,
+                full_data = data))
   }
 
 }

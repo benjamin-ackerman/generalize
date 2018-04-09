@@ -1,3 +1,5 @@
+### Maybe this will be one piece of a larger diagnostic function
+
 #' Calculate `generalizability index` to describe how similar or different trial is from population
 #'
 #' @param dat1B vector of probabilities of trial participation among individuals in the trial

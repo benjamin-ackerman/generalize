@@ -1,3 +1,9 @@
+## DONE: Parameter to specify what kind of weight you want (specifying to the "S = 1" or "S = 0 and 1" group) not disjoint: weight by inverse probability
+## Separate the two tasks: 1 is create the weights, 1 is assessing similarities
+## Don't print anything from this, have it be the behind the scenes
+## Can use this to send to diagnostics, G-index, or generalize function
+## Diagnostics: covariate balance, weighting --> include some sort of density plot
+
 #' Estimate weights for generalizing ATE by predicting probability of trial participation
 #'
 #' @param formula an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.
@@ -8,7 +14,7 @@
 #' gen_weights(trial ~ age + sex + race, data = ctn_data)
 #' gen_weights(trial ~ age + sex + race, data = ctn_data, method = 'rf')
 
-gen_weights = function(formula, data, method = "lr"){
+gen_weights = function(formula, data, method = "lr", is.data.disjoint = TRUE){
 
   ### Get variable names from the formula ###
   trial_membership = all.vars(formula)[1]
@@ -62,14 +68,20 @@ gen_weights = function(formula, data, method = "lr"){
     ),newx=test.x,s="lambda.1se",type="response"))
   }
 
-  weights = ifelse(data[,trial_membership]==0,0,ps/(1-ps))
+  if(is.data.disjoint == TRUE){
+    weights = ifelse(data[,trial_membership]==0,0,ps/(1-ps))
+  }
+
+  if(is.data.disjoint == FALSE){
+    weights = ifelse(data[,trial_membership]==0,0,1/ps)
+  }
+
   participation_probs = list(probs_population = ps[which(data[,trial_membership]==0)],
                      probs_trial = ps[which(data[,trial_membership]==0)])
 
   out = list(
     participation_probs = participation_probs,
-    weights = weights,
-    gen_index = gen_index(participation_probs$probs_population, participation_probs$probs_trial)
+    weights = weights
   )
 
   return(out)

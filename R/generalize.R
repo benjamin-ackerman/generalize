@@ -1,3 +1,8 @@
+### MAKE BART, TMLE their own function --> makes things very modular, can add new methods
+### separate out sample indicator and covariates? instead of formula?
+### get rid of outcome model parameter
+### instead of selection_formula, separate selection indicator and covariates
+
 #' Estimate weights for generalizing ATE by predicting probability of trial participation
 #'
 #' @param outcome variable denoting outcome
@@ -13,7 +18,8 @@
 #' generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "tmle")
 
 
-generalize <- function(outcome, treatment, selection_formula, data, method = "weighting", weight_method = "lr",outcome_formula = NULL){
+generalize <- function(outcome, treatment, selection_formula, data,
+                       method = "weighting", weight_method = "lr",outcome_formula = NULL){
 
   if (!is.data.frame(data)) {
     stop("Data must be a data.frame.", call. = FALSE)
@@ -54,7 +60,7 @@ generalize <- function(outcome, treatment, selection_formula, data, method = "we
   }
 
   ##### just keep the data we need #####
-  data= data[rownames(na.omit(data[,all.vars(selection_formula)])),c(outcome, treatment, all.vars(selection_formula))]
+  data = data[rownames(na.omit(data[,all.vars(selection_formula)])),c(outcome, treatment, all.vars(selection_formula))]
 
   ##### Weighting Methods #####
   if(method == "weighting"){
@@ -94,33 +100,7 @@ generalize <- function(outcome, treatment, selection_formula, data, method = "we
   }
 
   if(method == "TMLE"){
-
-    data = trim_pop(selection_formula, data)
-    selection.model <- glm(selection_formula,family="quasibinomial",data=data)
-
-    data_new0 <- data
-    data_new1 <- data
-    data_new0$a <- 0
-    data_new1$a <- 1
-
-    data$a1 <- predict(selection.model, newdata=data_new1, type="response")
-    data$a0 <- predict(selection.model, newdata=data_new0, type="response")
-
-    #arbitrarily assign A to those with missing A (those not in trial)
-    tmle.model0 <- tmle::tmle(Y=data[,outcome],
-                        A=ifelse(!is.na(data[,treatment]),data[,treatment],0),
-                        W=data[,covariates],
-                        Delta=data[,trial_membership],
-                        g1W=0.5,
-                        family='binomial',
-                        gbound=c(0,1),
-                        pDelta1=cbind(data$a0,data$a1)
-    )
-    OR = round(tmle.model0$estimate$OR$psi,2)
-    CI = paste0("(",round(tmle.model0$estimate$OR$CI[1],2),
-                "-",round(tmle.model0$estimate$OR$CI[2],2),")")
-
-    results = list(TATE = OR, TATE_CI = CI)
+    results = tmle(outcome, treatment, selection_formula, data)
   }
 
   return(results)
