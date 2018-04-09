@@ -7,8 +7,7 @@
 #' @param is.data.disjoint logical, if TRUE - trial and population data are considered independent.  If FALSE - trial is proper subset of population data.  See details for implications on weighting methods.
 #' @return
 #' @examples
-#' gen_weights(trial ~ age + sex + race, data = ctn_data)
-#' gen_weights(trial ~ age + sex + race, data = ctn_data, method = 'rf')
+#' assess(trial ~ age + sex + race, data = ctn_data)
 
 assess = function(formula, data, method = "lr", trim.pop = TRUE, is.data.disjoint = TRUE){
   ### Get variable names from the formula ###
@@ -41,7 +40,7 @@ assess = function(formula, data, method = "lr", trim.pop = TRUE, is.data.disjoin
   ### Clean up data from missing values ###
   data = data[rownames(na.omit(data[,all.vars(formula)])),]
 
-  if(trim.pop = TRUE){
+  if(trim.pop == TRUE){
     trimmed_data = trim_pop(formula, data = data)$trimmed_data
 
     ### Find number of population members excluded from trimming
@@ -60,7 +59,7 @@ assess = function(formula, data, method = "lr", trim.pop = TRUE, is.data.disjoin
     ))
   }
 
-  if(trim.pop = FALSE){
+  if(trim.pop == FALSE){
     ### Calculate participation probabilities, weights, generalizability index
     gen_weights_object = gen_weights(formula, data = data, method = method, is.data.disjoint = is.data.disjoint)
     participation_probs = gen_weights_object$participation_probs

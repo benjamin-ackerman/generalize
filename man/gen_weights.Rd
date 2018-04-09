@@ -4,7 +4,7 @@
 \alias{gen_weights}
 \title{Estimate weights for generalizing ATE by predicting probability of trial participation}
 \usage{
-gen_weights(formula, data, method = "lr")
+gen_weights(formula, data, method = "lr", is.data.disjoint = TRUE)
 }
 \arguments{
 \item{formula}{an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.}
