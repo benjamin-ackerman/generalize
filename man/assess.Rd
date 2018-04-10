@@ -2,25 +2,30 @@
 % Please edit documentation in R/assess.R
 \name{assess}
 \alias{assess}
-\title{Assess Generalizability of Randomized Trial}
+\title{Assess Generalizability of Randomized Trial to Population}
 \usage{
-assess(formula, data, method = "lr", trim.pop = TRUE,
-  is.data.disjoint = TRUE)
+assess(trial, selection_covariates, data, selection_method = "lr",
+  is_data_disjoint = TRUE, trim_pop = TRUE)
 }
 \arguments{
-\item{formula}{an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.}
+\item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}
 
-\item{data}{a data frame containing the variables specified in the model}
+\item{selection_covariates}{vector of covariate names in data set that predict trial participation}
 
-\item{method}{choose method to predict the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are random forests ("rf") and lasso ("lasso")}
+\item{data}{data frame comprised of "stacked" trial and target population data}
 
-\item{trim.pop}{logical, if TRUE - trim target population so that covariates do not exceed bounds of trial covariates}
+\item{selection_method}{method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")}
 
-\item{is.data.disjoint}{logical, if TRUE - trial and population data are considered independent.  If FALSE - trial is proper subset of population data.  See details for implications on weighting methods.}
+\item{is_data_disjoint}{logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.}
+
+\item{trim_pop}{logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.}
+}
+\value{
+\code{generalize} returns an object of the class "generalize"
 }
 \description{
-Assess Generalizability of Randomized Trial
+Assess Generalizability of Randomized Trial to Population
 }
 \examples{
-assess(trial ~ age + sex + race, data = ctn_data)
+generalize(outcome = "STUDYCOMPLETE", treatment = "treat", trial = "trial", selection_covariates = c("age","sex","race"), data = ctn_data, method = "weighting", selection_method = "rf")
 }

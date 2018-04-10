@@ -1,43 +1,43 @@
 ## Output: something that documents how many excluded, summarizes the "table 1" of covariate means for included/excluded
 ## Continuous variables: allow for some amount of "wiggle room" - threshold is not min or max
 
-#' Trim target population covariates to be within bounds of trial
+#' Subset Population so Population Covariates are within bounds of Trial Covariates
 #'
-#' @param formula an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.
-#' @param data a data frame containing the variables specified in the model
-#' @param just_population logical. if FALSE (default), function returns full data set, if TRUE, function only returns trimmed population data.
+#' @param trial variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)
+#' @param selection_covariates vector of covariate names in data set that predict trial participation
+#' @param data data frame comprised of "stacked" trial and target population data
 #' @return \code{trim_pop} returns a data frame, where the target population covariates do not exceed the bounds of the trial covariates
 #' @examples
-#' trim_pop(trial ~ age + sex + race, data = ctn_data)
+#' trim_pop(trial,selection_covariates = c("age","sex","race"), data = ctn_data)
 
-trim_pop <- function(formula, data, just_population = FALSE){
+trim_pop <- function(trial, selection_covariates, data){
 
-  trial_membership = all.vars(formula[[2]])
-  covariates = all.vars(formula[[3]])
-
-  if(class(formula) != "formula"){
-    stop("Must enter a valid formula!",call. = FALSE)
-  }
-
+  ##### CHECKS #####
   if (!is.data.frame(data)) {
-    stop("Data must be a data.frame.", call. = FALSE)}
-
-  if(anyNA(match(all.vars(formula),names(data)))){
-    missing_variables = all.vars(formula)[is.na(match(all.vars(formula),names(data)))]
-    stop(paste0(paste(missing_variables,collapse = ", ")," are not variables in the data provided"))
+    stop("Data must be a data.frame.", call. = FALSE)
   }
 
-  if(anyNA(match(names(table(data[,trial_membership])),c("0","1")))){
+  if(anyNA(match(selection_covariates,names(data)))){
+    stop("Not all covariates listed are variables in the data provided!",call. = FALSE)
+  }
+
+  if(!length(unique(data[,trial])) == 2){
+    stop("Trial Membership variable not binary", call. = FALSE)
+  }
+
+  if(anyNA(match(names(table(data[,trial])),c("0","1")))){
     stop("Sample Membership variable must be coded as `0` (not in trial) or `1` (in trial)",call. = FALSE)
   }
 
-  trial_dat = data[which(data[,trial_membership]==1),covariates]
+  ##### subset trial data covariates #####
+  trial_dat = data[which(data[,trial]==1),selection_covariates]
 
   if(length(covariates)==1){
     trial_dat = data.frame(trial_dat)
     names(trial_dat) = covariates
     }
 
+  ##### find covariate bounds in the trial #####
   covariate_bounds = function(covariate){
     if(is.factor(trial_dat[,covariate])){
 
@@ -51,24 +51,19 @@ trim_pop <- function(formula, data, just_population = FALSE){
     }
   }
 
-  bound_violations = purrr::map(covariates,covariate_bounds)
+  ##### find rows of population data that violate bounds #####
+  bound_violations = purrr::map(selection_covariates,covariate_bounds)
 
   missing_rows=unique(unlist(bound_violations))
 
   trimmed_data = data[which(!rownames(data) %in% missing_rows),]
 
+  ##### number of rows in population data excluded #####
   n_excluded = nrow(data) - nrow(trimmed_data)
 
-  if(just_population == TRUE){
-    return(list(n_excluded = n_excluded,
-                trimmed_data = trimmed_data[which(trimmed_data[,trial_membership] == 0),],
-                full_data = data))
-  }
+  out = list(n_excluded = n_excluded,
+             trimmed_data = trimmed_data,
+             untrimmed_data = data)
 
-  if(just_population == FALSE){
-    return(list(n_excluded = n_excluded,
-                trimmed_data = trimmed_data,
-                full_data = data))
-  }
-
+  return(out)
 }

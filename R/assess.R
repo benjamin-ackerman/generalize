@@ -1,53 +1,54 @@
-#' Assess Generalizability of Randomized Trial
+#' Assess Generalizability of Randomized Trial to Population
 #'
-#' @param formula an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.
-#' @param data a data frame containing the variables specified in the model
-#' @param method choose method to predict the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are random forests ("rf") and lasso ("lasso")
-#' @param trim.pop logical, if TRUE - trim target population so that covariates do not exceed bounds of trial covariates
-#' @param is.data.disjoint logical, if TRUE - trial and population data are considered independent.  If FALSE - trial is proper subset of population data.  See details for implications on weighting methods.
-#' @return
+#' @param trial variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)
+#' @param selection_covariates vector of covariate names in data set that predict trial participation
+#' @param data data frame comprised of "stacked" trial and target population data
+#' @param selection_method method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")
+#' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.
+#' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
+#' @return \code{generalize} returns an object of the class "generalize"
 #' @examples
-#' assess(trial ~ age + sex + race, data = ctn_data)
+#' generalize(outcome = "STUDYCOMPLETE", treatment = "treat", trial = "trial", selection_covariates = c("age","sex","race"), data = ctn_data, method = "weighting", selection_method = "rf")
 
-assess = function(formula, data, method = "lr", trim.pop = TRUE, is.data.disjoint = TRUE){
-  ### Get variable names from the formula ###
-  trial_membership = all.vars(formula)[1]
-  covariates = all.vars(formula)[-1]
+assess = function(trial, selection_covariates, data, selection_method = "lr",
+                  is_data_disjoint = TRUE, trim_pop = TRUE){
 
-  ### Checks ###
+  ##### make methods lower case #####
+  selection_method = tolower(selection_method)
 
-  # if (missing(data)) {
-  #   data <- environment(formula)
-  #   #stop("Data must be specified.", call. = FALSE)
-  # }
-
-  if(class(formula) != "formula"){
-    stop("Must enter a valid formula!",call. = FALSE)
-  }
-
+  ##### CHECKS #####
   if (!is.data.frame(data)) {
-    stop("Data must be a data.frame.", call. = FALSE)}
-
-  if(anyNA(match(all.vars(formula),names(data)))){
-    missing_variables = all.vars(formula)[is.na(match(all.vars(formula),names(data)))]
-    stop(paste0(paste(missing_variables,collapse = ", ")," not in the data provided"))
+    stop("Data must be a data.frame.", call. = FALSE)
   }
 
-  if(!length(unique(data[,trial_membership])) == 2){
+  if(anyNA(match(selection_covariates,names(data)))){
+    stop("Not all covariates listed are variables in the data provided!",call. = FALSE)
+  }
+
+  if(!length(unique(data[,trial])) == 2){
     stop("Trial Membership variable not binary", call. = FALSE)
   }
 
-  ### Clean up data from missing values ###
+  if(anyNA(match(names(table(data[,trial])),c("0","1")))){
+    stop("Sample Membership variable must be coded as `0` (not in trial) or `1` (in trial)",call. = FALSE)
+  }
+
+  if(!selection_method %in% c("lr","rf","lasso")){
+    stop("Invalid weighting method!",call. = FALSE)
+  }
+
+
+  ##### Clean up data from missing values #####
   data = data[rownames(na.omit(data[,all.vars(formula)])),]
 
-  if(trim.pop == TRUE){
+  if(trim_pop == TRUE){
     trimmed_data = trim_pop(formula, data = data)$trimmed_data
 
-    ### Find number of population members excluded from trimming
+    ##### Find number of population members excluded from trimming #####
     n_excluded = trim_pop(formula, data = data)$n_excluded
 
-    ### Calculate participation probabilities, weights, generalizability index
-    gen_weights_object = gen_weights(formula, data = trimmed_data, method = method, is.data.disjoint = is.data.disjoint)
+    ##### Calculate participation probabilities, weights, generalizability index #####
+    gen_weights_object = gen_weights(formula, data = trimmed_data, method = selection_method, is_data_disjoint = is_data_disjoint)
     participation_probs = gen_weights_object$participation_probs
     weights = gen_weights_object$weights
 
@@ -59,9 +60,9 @@ assess = function(formula, data, method = "lr", trim.pop = TRUE, is.data.disjoin
     ))
   }
 
-  if(trim.pop == FALSE){
-    ### Calculate participation probabilities, weights, generalizability index
-    gen_weights_object = gen_weights(formula, data = data, method = method, is.data.disjoint = is.data.disjoint)
+  if(trim_pop == FALSE){
+    ##### Calculate participation probabilities, weights, generalizability index #####
+    gen_weights_object = gen_weights(formula, data = data, method = selection_method, is_data_disjoint = is_data_disjoint)
     participation_probs = gen_weights_object$participation_probs
     weights = gen_weights_object$weights
 

@@ -2,23 +2,23 @@
 % Please edit documentation in R/trim_pop.R
 \name{trim_pop}
 \alias{trim_pop}
-\title{Trim target population covariates to be within bounds of trial}
+\title{Subset Population so Population Covariates are within bounds of Trial Covariates}
 \usage{
-trim_pop(formula, data, just_population = FALSE)
+trim_pop(trial, selection_covariates, data)
 }
 \arguments{
-\item{formula}{an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.}
+\item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}
 
-\item{data}{a data frame containing the variables specified in the model}
+\item{selection_covariates}{vector of covariate names in data set that predict trial participation}
 
-\item{just_population}{logical. if FALSE (default), function returns full data set, if TRUE, function only returns trimmed population data.}
+\item{data}{data frame comprised of "stacked" trial and target population data}
 }
 \value{
 \code{trim_pop} returns a data frame, where the target population covariates do not exceed the bounds of the trial covariates
 }
 \description{
-Trim target population covariates to be within bounds of trial
+Subset Population so Population Covariates are within bounds of Trial Covariates
 }
 \examples{
-trim_pop(trial ~ age + sex + race, data = ctn_data)
+trim_pop(trial,selection_covariates = c("age","sex","race"), data = ctn_data)
 }

@@ -1,29 +1,27 @@
-tmle <- function(outcome,treatment, formula, data){
-  if (!is.data.frame(data)) {
-    stop("Data must be a data.frame.", call. = FALSE)
-  }
+#' TMLE
+#'
+#' @param outcome variable denoting outcome
+#' @param treatment variable denoting binary treatment assignment (ok if only available in trial, not population)
+#' @param data a data frame containing the variables specified in the model
+#' @param method choose method to generalize average treatment effect.  Default is "weighting" (weighting by the odds of participation probability).  Other methods supported are "bart" (Bayesian Additive Regression Trees - NOT READY YET) and "tmle" (Targeted Maximum Likelihood Estimation)
+#' @param weight_method choose method to predict the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are random forests ("rf") and lasso ("lasso")
+#' @param outcome_formula an object of class "formula." Can specify an optional outcome model to include pre-treatment covariates.
+#' @return \code{generalize} returns an object of the class "generalize", containing the following: \code{TATE} (target population average treatment effect), \code{TATE_CI} (95% Confidence Interval for TATE).  If outcome is binary, reports TATE as risk difference as well as odds ratio, with accompanying CIs
+#' @examples
+#' generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "weighting")
+#' generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "tmle")
 
-  if(anyNA(match(outcome,names(data)))){
-    stop("Outcome is not a variable in the data provided!",call. = FALSE)
-  }
+tmle <- function(outcome, # variable name
+                 treatment, # variable name: must be binary indicator of treatment, values can be missing in population data
+                 trial, # variable name: must be binary indicator
+                 selection_covariates, # a vector of covariate names in data set that predict trial participation
+                 data # data frame containing data
+                 ){
 
-  if(anyNA(match(treatment,names(data)))){
-    stop("Treatment is not a variable in the data provided!",call. = FALSE)
-  }
+  data = trim_pop(trial = trial, covariates = selection_covariates, data = data)$trimmed_data
 
-  if(class(formula) != "formula"){
-    stop("Must enter a valid formula!",call. = FALSE)
-  }
+  formula = as.formula(paste(trial, paste(selection_covariates,collapse="+"),sep="~"))
 
-  if(anyNA(match(all.vars(selection_formula),names(data)))){
-    missing_variables = all.vars(selection_formula)[is.na(match(all.vars(selection_formula),names(data)))]
-    stop(paste0(paste(missing_variables,collapse = ", ")," are not variables in the data provided"))
-  }
-
-  trial_membership = all.vars(selection_formula)[1]
-  covariates = all.vars(selection_formula)[-1]
-
-  data = trim_pop(formula, data)$trimmed_data
   selection.model <- glm(formula,family="quasibinomial",data=data)
 
   data_new0 <- data
@@ -34,19 +32,35 @@ tmle <- function(outcome,treatment, formula, data){
   data$a1 <- predict(selection.model, newdata=data_new1, type="response")
   data$a0 <- predict(selection.model, newdata=data_new0, type="response")
 
-  #arbitrarily assign A to those with missing A (those not in trial)
-  tmle.model0 <- tmle::tmle(Y=data[,outcome],
-                            A=ifelse(!is.na(data[,treatment]),data[,treatment],0),
-                            W=data[,covariates],
-                            Delta=data[,trial_membership],
-                            g1W=0.5,
-                            family='binomial',
-                            gbound=c(0,1),
-                            pDelta1=cbind(data$a0,data$a1)
-  )
-  OR = round(tmle.model0$estimate$OR$psi,2)
-  CI = paste0("(",round(tmle.model0$estimate$OR$CI[1],2),
-              "-",round(tmle.model0$estimate$OR$CI[2],2),")")
+  tmle.family = "gaussian"
 
-  results = list(TATE = OR, TATE_CI = CI)
+  ### Trying to account for binary outcomes
+  # if(dim(table(data[,outcome])) == 2){
+  #   tmle.family = "binomial"
+  # }
+
+  tmle.model <- tmle::tmle(Y=data[,outcome],
+                              A=ifelse(!is.na(data[,treatment]),data[,treatment],0),
+                              W=data[,covariates],
+                              Delta=data[,trial_membership],
+                              g1W=0.5,
+                              family= tmle.family,
+                              gbound=c(0,1),
+                              pDelta1=cbind(data$a0,data$a1)
+                             )
+
+  TATE = tmle.model$estimates$ATE$psi
+  TATE_se = sqrt(tmle.model$estimates$ATE$var.psi)
+  TATE_CI_l = TATE - 1.96*TATE_se
+  TATE_CI_u = TATE + 1.96*TATE_se
+
+  # TATE_OR = round(tmle.model$estimate$OR$psi,2)
+  # TATE_se
+
+  # CI = paste0("(",round(tmle.model$estimate$OR$CI[1],2),
+  #             "-",round(tmle.model$estimate$OR$CI[2],2),")")
+
+  out = c(TATE, TATE_se, TATE_CI_l, TATE_CI_u)
+
+  return(out)
 }

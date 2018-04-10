@@ -4,14 +4,21 @@
 \alias{gen_weights}
 \title{Estimate weights for generalizing ATE by predicting probability of trial participation}
 \usage{
-gen_weights(formula, data, method = "lr", is.data.disjoint = TRUE)
+gen_weights(trial, selection_covariates, data, selection_method = "lr",
+  is_data_disjoint = TRUE, trim_pop = TRUE)
 }
 \arguments{
-\item{formula}{an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.}
+\item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}
 
-\item{data}{a data frame containing the variables specified in the model}
+\item{selection_covariates}{vector of covariate names in data set that predict trial participation}
 
-\item{method}{choose method to predict the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are random forests ("rf") and lasso ("lasso")}
+\item{data}{data frame comprised of "stacked" trial and target population data}
+
+\item{selection_method}{method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")}
+
+\item{is_data_disjoint}{logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.}
+
+\item{trim_pop}{logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.}
 }
 \value{
 \code{gen_weights} returns an object of the class "gen_weights", containing the following: \code{participation_probs} (predicted probabilities of trial participation), \code{weights} (weights constructed from predicted probabilities - see description for more details), \code{gen_index} (generalizability index)
