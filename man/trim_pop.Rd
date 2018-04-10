@@ -4,10 +4,12 @@
 \alias{trim_pop}
 \title{Trim target population covariates to be within bounds of trial}
 \usage{
-trim_pop(formula, data, just_population = FALSE)
+trim_pop(trial, covariates, data, just_population = FALSE)
 }
 \arguments{
-\item{formula}{an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.}
+\item{trial}{variable name: must be binary indicator}
+
+\item{covariates}{a vector of covariate names in data set that predict trial participation}
 
 \item{data}{a data frame containing the variables specified in the model}
 
@@ -20,5 +22,5 @@ trim_pop(formula, data, just_population = FALSE)
 Trim target population covariates to be within bounds of trial
 }
 \examples{
-trim_pop(trial ~ age + sex + race, data = ctn_data)
+trim_pop(trial,covariates, data = ctn_data)
 }

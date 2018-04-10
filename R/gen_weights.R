@@ -6,61 +6,59 @@
 
 #' Estimate weights for generalizing ATE by predicting probability of trial participation
 #'
-#' @param formula an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.
-#' @param data a data frame containing the variables specified in the model
-#' @param method choose method to predict the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are random forests ("rf") and lasso ("lasso")
+#' @param trial variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)
+#' @param selection_covariates vector of covariate names in data set that predict trial participation
+#' @param data data frame comprised of "stacked" trial and target population data
+#' @param selection_method method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")
+#' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.
+#' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
 #' @return \code{gen_weights} returns an object of the class "gen_weights", containing the following: \code{participation_probs} (predicted probabilities of trial participation), \code{weights} (weights constructed from predicted probabilities - see description for more details), \code{gen_index} (generalizability index)
 #' @examples
 #' gen_weights(trial ~ age + sex + race, data = ctn_data)
 #' gen_weights(trial ~ age + sex + race, data = ctn_data, method = 'rf')
 
-gen_weights = function(formula, data, method = "lr", is.data.disjoint = TRUE){
+gen_weights = function(trial, selection_covariates, data, selection_method = "lr",
+                       is_data_disjoint = TRUE, trim_pop = TRUE){
 
-  ### Get variable names from the formula ###
-  trial_membership = all.vars(formula)[1]
-  covariates = all.vars(formula)[-1]
+  ### Make input method lower case ###
+  selection_method = tolower(selection_method)
 
   ### Checks ###
-
-  # if (missing(data)) {
-  #   data <- environment(formula)
-  #   #stop("Data must be specified.", call. = FALSE)
-  # }
-
-  if(class(formula) != "formula"){
-    stop("Must enter a valid formula!",call. = FALSE)
-  }
-
   if (!is.data.frame(data)) {
     stop("Data must be a data.frame.", call. = FALSE)}
 
-  if(anyNA(match(all.vars(formula),names(data)))){
-    missing_variables = all.vars(formula)[is.na(match(all.vars(formula),names(data)))]
-    stop(paste0(paste(missing_variables,collapse = ", ")," not in the data provided"))
+  if(anyNA(match(selection_covariates,names(data)))){
+    stop("Not all covariates listed are variables in the data provided!",call. = FALSE)
   }
 
-  if(!length(unique(data[,trial_membership])) == 2){
+  if(!length(unique(data[,trial])) == 2){
     stop("Trial Membership variable not binary", call. = FALSE)
   }
 
+  if(!selection_method %in% c("lr","rf","lasso")){
+    stop("Invalid method!",call. = FALSE)
+  }
 
   ### Clean up data from missing values ###
-  data = data[rownames(na.omit(data[,all.vars(formula)])),]
+  data = data[rownames(na.omit(data[,c(trial,selection_covariates)])),]
 
-  ### Logistic Regression
-
-  if(method == "lr"){
+  ### Generate Participation Probabilities ###
+  # Logistic Regression
+  if(selection_method == "lr"){
+    formula = as.formula(paste(trial, paste(selection_covariates,collapse="+"),sep="~"))
     ps = predict(glm(formula, data = data, family='quasibinomial'),type = 'response')
   }
 
-  if(method == "rf"){
-    formula = as.formula(paste0("as.factor(",trial_membership,") ~ ",as.character(formula)[3]))
+  # Random Forests
+  if(selection_method == "rf"){
+    formula = as.formula(paste( paste("as.factor(",trial,")"), paste(selection_covariates,collapse="+"),sep="~"))
     ps = predict(randomForest::randomForest(formula, data=data, na.action=na.omit, sampsize = 454, ntree=1500),type = 'prob')[,2]
   }
 
-  if(method == "lasso"){
-    test.x = model.matrix(~ -1 + ., data=data[,covariates])
-    test.y = data[,trial_membership]
+  # Lasso
+  if(selection_method == "lasso"){
+    test.x = model.matrix(~ -1 + ., data=data[,selection_covariates])
+    test.y = data[,trial]
     ps = as.numeric(predict(glmnet::cv.glmnet(
       x=test.x,
       y=test.y,
@@ -68,21 +66,21 @@ gen_weights = function(formula, data, method = "lr", is.data.disjoint = TRUE){
     ),newx=test.x,s="lambda.1se",type="response"))
   }
 
-  if(is.data.disjoint == TRUE){
-    weights = ifelse(data[,trial_membership]==0,0,ps/(1-ps))
+  ### Generate Weights ###
+  if(is_data_disjoint == TRUE){
+    weights = ifelse(data[,trial]==0,0,ps/(1-ps))
   }
 
-  if(is.data.disjoint == FALSE){
-    weights = ifelse(data[,trial_membership]==0,0,1/ps)
+  if(is_data_disjoint == FALSE){
+    weights = ifelse(data[,trial]==0,0,1/ps)
   }
 
-  participation_probs = list(probs_population = ps[which(data[,trial_membership]==0)],
-                     probs_trial = ps[which(data[,trial_membership]==0)])
+  participation_probs = list(probs_population = ps[which(data[,trial]==0)],
+                             probs_trial = ps[which(data[,trial]==0)])
 
-  out = list(
-    participation_probs = participation_probs,
-    weights = weights
-  )
+  out = list(method = selection_method,
+             participation_probs = participation_probs,
+             weights = weights)
 
   return(out)
 }

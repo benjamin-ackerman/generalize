@@ -4,12 +4,10 @@
 \alias{assess}
 \title{Assess Generalizability of Randomized Trial}
 \usage{
-assess(formula, data, method = "lr", trim.pop = TRUE,
+assess(trial, selection_covariates, data, method = "lr", trim.pop = TRUE,
   is.data.disjoint = TRUE)
 }
 \arguments{
-\item{formula}{an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.}
-
 \item{data}{a data frame containing the variables specified in the model}
 
 \item{method}{choose method to predict the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are random forests ("rf") and lasso ("lasso")}
@@ -17,6 +15,8 @@ assess(formula, data, method = "lr", trim.pop = TRUE,
 \item{trim.pop}{logical, if TRUE - trim target population so that covariates do not exceed bounds of trial covariates}
 
 \item{is.data.disjoint}{logical, if TRUE - trial and population data are considered independent.  If FALSE - trial is proper subset of population data.  See details for implications on weighting methods.}
+
+\item{formula}{an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.}
 }
 \description{
 Assess Generalizability of Randomized Trial

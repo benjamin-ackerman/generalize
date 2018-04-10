@@ -2,33 +2,34 @@
 % Please edit documentation in R/generalize.R
 \name{generalize}
 \alias{generalize}
-\title{Estimate weights for generalizing ATE by predicting probability of trial participation}
+\title{Generalize Average Treatment Effect from Randomized Trial to Population}
 \usage{
-generalize(outcome, treatment, selection_formula, data, method = "weighting",
-  weight_method = "lr", outcome_formula = NULL)
+generalize(outcome, treatment, trial, selection_covariates, data,
+  method = "weighting", weight_method = "lr", is.data.disjoint = TRUE)
 }
 \arguments{
-\item{outcome}{variable denoting outcome}
+\item{outcome}{variable name denoting outcome}
 
-\item{treatment}{variable denoting binary treatment assignment (ok if only available in trial, not population)}
+\item{treatment}{variable name denoting binary treatment assignment (ok if only available in trial, not population)}
 
-\item{selection_formula}{an object of class "formula." The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.}
+\item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}
 
-\item{data}{a data frame containing the variables specified in the model}
+\item{selection_covariates}{vector of covariate names in data set that predict trial participation}
 
-\item{method}{choose method to generalize average treatment effect.  Default is "weighting" (weighting by the odds of participation probability).  Other methods supported are "bart" (Bayesian Additive Regression Trees - NOT READY YET) and "tmle" (Targeted Maximum Likelihood Estimation)}
+\item{data}{data frame comprised of "stacked" trial and target population data}
 
-\item{weight_method}{choose method to predict the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are random forests ("rf") and lasso ("lasso")}
+\item{method}{method to generalize average treatment effect to the target population.  Default is "weighting" (weighting by participation probability).  Other methods supported are "BART" (Bayesian Additive Regression Trees - NOT READY YET) and "TMLE" (Targeted Maximum Likelihood Estimation)}
 
-\item{outcome_formula}{an object of class "formula." Can specify an optional outcome model to include pre-treatment covariates.}
+\item{weight_method}{method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")}
+
+\item{is.data.disjoint}{logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.}
 }
 \value{
-\code{generalize} returns an object of the class "generalize", containing the following: \code{TATE} (target population average treatment effect), \code{TATE_CI} (95% Confidence Interval for TATE).  If outcome is binary, reports TATE as risk difference as well as odds ratio, with accompanying CIs
+\code{generalize} returns an object of the class "generalize"
 }
 \description{
-Estimate weights for generalizing ATE by predicting probability of trial participation
+Generalize Average Treatment Effect from Randomized Trial to Population
 }
 \examples{
-generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "weighting")
-generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "tmle")
+generalize(outcome = "STUDYCOMPLETE", treatment = "treat", trial = "trial", selection_covariates = c("age","sex","race"), data = ctn_data, method = "weighting", weight_method = "rf")
 }
