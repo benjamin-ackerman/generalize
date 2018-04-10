@@ -2,31 +2,31 @@
 % Please edit documentation in R/weighting.R
 \name{weighting}
 \alias{weighting}
-\title{Weighting method}
+\title{Estimate weights for generalizing ATE by predicting probability of trial participation}
 \usage{
 weighting(outcome, treatment, trial, selection_covariates, data,
-  method = "lr", is.data.disjoint = TRUE)
+  selection_method = "lr", is_data_disjoint = TRUE, trim_pop = TRUE)
 }
 \arguments{
-\item{outcome}{variable denoting outcome}
+\item{outcome}{variable name denoting outcome}
 
-\item{treatment}{variable denoting binary treatment assignment (ok if only available in trial, not population)}
+\item{treatment}{variable name denoting binary treatment assignment (ok if only available in trial, not population)}
 
-\item{data}{a data frame containing the variables specified in the model}
+\item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}
 
-\item{selection_formula}{an object of class "formula." The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.}
+\item{selection_covariates}{vector of covariate names in data set that predict trial participation}
 
-\item{selection_method}{choose method to predict the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are random forests ("rf") and lasso ("lasso")}
+\item{data}{data frame comprised of "stacked" trial and target population data}
 
-\item{outcome_formula}{an object of class "formula." Can specify an optional outcome model to include pre-treatment covariates.}
-}
-\value{
-\code{generalize} returns an object of the class "generalize", containing the following: \code{TATE} (target population average treatment effect), \code{TATE_CI} (95% Confidence Interval for TATE).  If outcome is binary, reports TATE as risk difference as well as odds ratio, with accompanying CIs
+\item{selection_method}{method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")}
+
+\item{is_data_disjoint}{logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.}
+
+\item{trim_pop}{logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.}
 }
 \description{
-Weighting method
+Estimate weights for generalizing ATE by predicting probability of trial participation
 }
 \examples{
-generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "weighting")
-generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "tmle")
+weighting("FUPMETH","treat","trial",c("age","sex","race"),ctn_data)
 }

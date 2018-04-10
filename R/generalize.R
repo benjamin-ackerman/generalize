@@ -79,7 +79,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
 
   ##### Weighting Methods #####
   if(method == "weighting"){
-    TATE_results = weighting(outcome, treatment, trial, selection_covariates, data, method = selection_method, is_data_disjoint = is_data_disjoint)
+    TATE_results = weighting(outcome, treatment, trial, selection_covariates, data, selection_method, is_data_disjoint, trim_pop)$TATE
   }
 
   if(method == "BART"){
@@ -87,7 +87,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   }
 
   if(method == "TMLE"){
-    TATE_results = tmle(outcome, treatment, trial, selection_covariates, data)
+    TATE_results = tmle(outcome, treatment, trial, selection_covariates, data)$TATE
   }
 
   result.tab = rbind(SATE_results, TATE_results)
