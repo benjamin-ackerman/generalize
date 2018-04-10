@@ -27,6 +27,3 @@ weighting(outcome, treatment, trial, selection_covariates, data,
 \description{
 Estimate weights for generalizing ATE by predicting probability of trial participation
 }
-\examples{
-weighting("FUPMETH","treat","trial",c("age","sex","race"),ctn_data)
-}

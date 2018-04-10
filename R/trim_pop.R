@@ -8,7 +8,6 @@
 #' @param data data frame comprised of "stacked" trial and target population data
 #' @return \code{trim_pop} returns a data frame, where the target population covariates do not exceed the bounds of the trial covariates
 #' @examples
-#' trim_pop(trial,selection_covariates = c("age","sex","race"), data = ctn_data)
 
 trim_pop <- function(trial, selection_covariates, data){
 

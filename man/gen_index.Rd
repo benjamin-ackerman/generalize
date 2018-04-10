@@ -17,6 +17,3 @@ the generalizability index, a value between 0 and 1, where scores greater than 1
 \description{
 Calculate `generalizability index` to describe how similar or different trial is from population
 }
-\examples{
-gen_index(probs_population, probs_trial)
-}

@@ -16,7 +16,6 @@
 #' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
 #' @return
 #' @examples
-#' weighting("FUPMETH","treat","trial",c("age","sex","race"),ctn_data)
 
 weighting = function(outcome, treatment, trial, selection_covariates, data, selection_method = "lr",
                        is_data_disjoint = TRUE, trim_pop = TRUE){

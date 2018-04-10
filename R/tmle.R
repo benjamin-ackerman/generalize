@@ -8,8 +8,6 @@
 #' @param outcome_formula an object of class "formula." Can specify an optional outcome model to include pre-treatment covariates.
 #' @return \code{generalize} returns an object of the class "generalize", containing the following: \code{TATE} (target population average treatment effect), \code{TATE_CI} (95% Confidence Interval for TATE).  If outcome is binary, reports TATE as risk difference as well as odds ratio, with accompanying CIs
 #' @examples
-#' generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "weighting")
-#' generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "tmle")
 
 tmle <- function(outcome, # variable name
                  treatment, # variable name: must be binary indicator of treatment, values can be missing in population data

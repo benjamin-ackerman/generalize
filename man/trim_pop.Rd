@@ -19,6 +19,3 @@ trim_pop(trial, selection_covariates, data)
 \description{
 Subset Population so Population Covariates are within bounds of Trial Covariates
 }
-\examples{
-trim_pop(trial,selection_covariates = c("age","sex","race"), data = ctn_data)
-}

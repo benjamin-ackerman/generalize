@@ -11,7 +11,6 @@
 #' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
 #' @return \code{generalize} returns an object of the class "generalize"
 #' @examples
-#' generalize(outcome = "STUDYCOMPLETE", treatment = "treat", trial = "trial", selection_covariates = c("age","sex","race"), data = ctn_data, method = "weighting", selection_method = "rf")
 
 
 generalize <- function(outcome, treatment, trial, selection_covariates, data, method = "weighting",
