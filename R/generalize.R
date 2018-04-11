@@ -3,7 +3,7 @@
 ## Can generate participation probs and weights to be used for
     ## generalizability index
     ## plotting the distributions
-    ##
+    ## KEEP ASSESS
 ### ***write code to make outcome and treatment null, then just use for assessing generalizability***
 
 #' Generalize Average Treatment Effect from Randomized Trial to Population
@@ -33,17 +33,14 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     stop("Data must be a data.frame.", call. = FALSE)
   }
 
-  if(!is.null(outcome) & anyNA(match(outcome,names(data)))){
+  if(anyNA(match(outcome,names(data)))){
     stop("Outcome is not a variable in the data provided!",call. = FALSE)
   }
 
-  if(!is.null(treatment) & anyNA(match(treatment,names(data)))){
+  if(anyNA(match(treatment,names(data)))){
     stop("Treatment is not a variable in the data provided!",call. = FALSE)
   }
 
-  if((!is.null(outcome) & is.null(treatment)) | (is.null(outcome) & !is.null(treatment))){
-    stop("Must specify either BOTH treatment and outcome, or NEITHER treatment not outcome", call. = FALSE)
-  }
 
   if(anyNA(match(selection_covariates,names(data)))){
     stop("Not all covariates listed are variables in the data provided!",call. = FALSE)
@@ -57,7 +54,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     stop("Sample Membership variable must be coded as `0` (not in trial) or `1` (in trial)",call. = FALSE)
   }
 
-  if(!is.null(treatment) & !length(na.omit(unique(data[,treatment]))) == 2){
+  if(length(na.omit(unique(data[,treatment]))) == 2){
     stop("Treatment variable not binary", call. = FALSE)
   }
 
@@ -89,43 +86,36 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   g_index = gen_index(participation_probs$probs_population, participation_probs$probs_trial)
 
   ##### Generalize results #####
-  ## If just assessing generalizability, don't create result table
-  if(is.null(outcome) & is.null(treatment)){
-    result.tab = NULL
+  ## First, estimate SATE
+  SATE_model = lm(as.formula(paste(outcome,treatment,sep="~")), data = data)
+
+  SATE = summary(SATE_model)$coefficients[treatment, "Estimate"]
+  SATE_se = summary(SATE_model)$coefficients[treatment, "Std. Error"]
+
+  SATE_CI_l = SATE - 1.96*SATE_se
+  SATE_CI_u = SATE + 1.96*SATE_se
+
+  SATE_results = c(SATE,SATE_se,SATE_CI_l,SATE_CI_u)
+
+  ## Weighting results
+  if(method == "weighting"){
+    TATE_results = weight_object$TATE
   }
 
-  else{
-    ## First, estimate SATE
-    SATE_model = lm(as.formula(paste(outcome,treatment,sep="~")), data = data)
-
-    SATE = summary(SATE_model)$coefficients[treatment, "Estimate"]
-    SATE_se = summary(SATE_model)$coefficients[treatment, "Std. Error"]
-
-    SATE_CI_l = SATE - 1.96*SATE_se
-    SATE_CI_u = SATE + 1.96*SATE_se
-
-    SATE_results = c(SATE,SATE_se,SATE_CI_l,SATE_CI_u)
-
-    ## Weighting results
-    if(method == "weighting"){
-      TATE_results = weight_object$TATE
-    }
-
-    ## BART results
-    if(method == "BART"){
-      TATE_results = "NOT READY YET"
-    }
-
-    ## TMLE results
-    if(method == "TMLE"){
-      TATE_results = tmle(outcome, treatment, trial, selection_covariates, data)$TATE
-    }
-
-    ## put together results table
-    result.tab = rbind(SATE_results, TATE_results)
-    colnames(result.tab) = c("Estimate","Std. Error","95% CI Lower","95% CI Upper")
-    row.names(result.tab) = c("SATE","TATE")
+  ## BART results
+  if(method == "BART"){
+    TATE_results = "NOT READY YET"
   }
+
+  ## TMLE results
+  if(method == "TMLE"){
+    TATE_results = tmle(outcome, treatment, trial, selection_covariates, data)$TATE
+  }
+
+  ## put together results table
+  result.tab = rbind(SATE_results, TATE_results)
+  colnames(result.tab) = c("Estimate","Std. Error","95% CI Lower","95% CI Upper")
+  row.names(result.tab) = c("SATE","TATE")
 
   ##### Items to save to "generalize" object #####
   out = list(
@@ -144,4 +134,10 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   class(out) = "generalize"
 
   return(out)
+  #invisible(out) --> returns output but doesn't print anything
 }
+
+# S3 Methods (roxygenize voodoo)
+# summary.generalize #first parameter needs to be called "object"
+# print.generalize #first parameter needs to be called "x" (maybe use "invisible(x)")
+# print.summary.generalize
