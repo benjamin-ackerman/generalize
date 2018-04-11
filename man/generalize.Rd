@@ -5,12 +5,8 @@
 \title{Generalize Average Treatment Effect from Randomized Trial to Population}
 \usage{
 generalize(outcome, treatment, trial, selection_covariates, data,
-<<<<<<< HEAD
   method = "weighting", selection_method = "lr", is_data_disjoint = TRUE,
   trim_pop = TRUE)
-=======
-  method = "weighting", weight_method = "lr", is.data.disjoint = TRUE)
->>>>>>> 9556e35d29cc067f2a5261ef6c3024119ac2d1d4
 }
 \arguments{
 \item{outcome}{variable name denoting outcome}
@@ -25,27 +21,15 @@ generalize(outcome, treatment, trial, selection_covariates, data,
 
 \item{method}{method to generalize average treatment effect to the target population.  Default is "weighting" (weighting by participation probability).  Other methods supported are "BART" (Bayesian Additive Regression Trees - NOT READY YET) and "TMLE" (Targeted Maximum Likelihood Estimation)}
 
-<<<<<<< HEAD
 \item{selection_method}{method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")}
 
 \item{is_data_disjoint}{logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.}
 
 \item{trim_pop}{logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.}
-=======
-\item{weight_method}{method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")}
-
-\item{is.data.disjoint}{logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.}
->>>>>>> 9556e35d29cc067f2a5261ef6c3024119ac2d1d4
 }
 \value{
 \code{generalize} returns an object of the class "generalize"
 }
 \description{
 Generalize Average Treatment Effect from Randomized Trial to Population
-<<<<<<< HEAD
-=======
-}
-\examples{
-generalize(outcome = "STUDYCOMPLETE", treatment = "treat", trial = "trial", selection_covariates = c("age","sex","race"), data = ctn_data, method = "weighting", weight_method = "rf")
->>>>>>> 9556e35d29cc067f2a5261ef6c3024119ac2d1d4
 }

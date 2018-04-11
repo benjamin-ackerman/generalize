@@ -33,15 +33,15 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     stop("Data must be a data.frame.", call. = FALSE)
   }
 
-  if(anyNA(match(outcome,names(data)))){
+  if(is.null(outcome) | anyNA(match(outcome,names(data)))){
     stop("Outcome is not a variable in the data provided!",call. = FALSE)
   }
 
-  if(anyNA(match(treatment,names(data)))){
+  if(is.null(treatment) | anyNA(match(treatment,names(data)))){
     stop("Treatment is not a variable in the data provided!",call. = FALSE)
   }
 
-  if(anyNA(match(selection_covariates,names(data)))){
+  if(is.null(selection_covariates) | anyNA(match(selection_covariates,names(data)))){
     stop("Not all covariates listed are variables in the data provided!",call. = FALSE)
   }
 
@@ -53,7 +53,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     stop("Sample Membership variable must be coded as `0` (not in trial) or `1` (in trial)",call. = FALSE)
   }
 
-  if(length(na.omit(unique(data[,treatment]))) == 2){
+  if(!length(na.omit(unique(data[,treatment]))) == 2){
     stop("Treatment variable not binary", call. = FALSE)
   }
 

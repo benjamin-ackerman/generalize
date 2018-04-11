@@ -2,7 +2,6 @@
 % Please edit documentation in R/weighting.R
 \name{weighting}
 \alias{weighting}
-<<<<<<< HEAD
 \title{Estimate weights for generalizing ATE by predicting probability of trial participation}
 \usage{
 weighting(outcome, treatment, trial, selection_covariates, data,
@@ -27,35 +26,4 @@ weighting(outcome, treatment, trial, selection_covariates, data,
 }
 \description{
 Estimate weights for generalizing ATE by predicting probability of trial participation
-=======
-\title{Weighting method}
-\usage{
-weighting(outcome, treatment, trial, selection_covariates, data,
-  method = "lr", is.data.disjoint = TRUE)
-}
-\arguments{
-\item{outcome}{variable denoting outcome}
-
-\item{treatment}{variable denoting binary treatment assignment (ok if only available in trial, not population)}
-
-\item{data}{a data frame containing the variables specified in the model}
-
-\item{method}{choose method to generalize average treatment effect.  Default is "weighting" (weighting by the odds of participation probability).  Other methods supported are "bart" (Bayesian Additive Regression Trees - NOT READY YET) and "tmle" (Targeted Maximum Likelihood Estimation)}
-
-\item{selection_formula}{an object of class "formula." The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.}
-
-\item{weight_method}{choose method to predict the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are random forests ("rf") and lasso ("lasso")}
-
-\item{outcome_formula}{an object of class "formula." Can specify an optional outcome model to include pre-treatment covariates.}
-}
-\value{
-\code{generalize} returns an object of the class "generalize", containing the following: \code{TATE} (target population average treatment effect), \code{TATE_CI} (95% Confidence Interval for TATE).  If outcome is binary, reports TATE as risk difference as well as odds ratio, with accompanying CIs
-}
-\description{
-Weighting method
-}
-\examples{
-generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "weighting")
-generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "tmle")
->>>>>>> 9556e35d29cc067f2a5261ef6c3024119ac2d1d4
 }

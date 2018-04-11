@@ -25,10 +25,3 @@ tmle(outcome, treatment, trial, selection_covariates, data)
 \description{
 TMLE
 }
-<<<<<<< HEAD
-=======
-\examples{
-generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "weighting")
-generalize(outcome = "STUDYCOMPLETE", treatment = "treat", selection_formula = trial ~ age + sex + race, data = ctn_data, method = "tmle")
-}
->>>>>>> 9556e35d29cc067f2a5261ef6c3024119ac2d1d4

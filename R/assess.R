@@ -46,7 +46,7 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
   }
 
   weighting_object = weighting(outcome = NULL, treatment = NULL, trial, selection_covariates, data,
-                               selection_method, is_data_disjoint, trim_pop)
+                               selection_method, is_data_disjoint)
 
   participation_probs = weighting_object$participation_probs
   weights = weighting_object$weights

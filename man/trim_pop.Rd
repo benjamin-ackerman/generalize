@@ -4,19 +4,10 @@
 \alias{trim_pop}
 \title{Subset Population so Population Covariates are within bounds of Trial Covariates}
 \usage{
-<<<<<<< HEAD
 trim_pop(trial, selection_covariates, data)
 }
 \arguments{
 \item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}
-=======
-trim_pop(trial, covariates, data, just_population = FALSE)
-}
-\arguments{
-\item{trial}{variable name: must be binary indicator}
-
-\item{covariates}{a vector of covariate names in data set that predict trial participation}
->>>>>>> 9556e35d29cc067f2a5261ef6c3024119ac2d1d4
 
 \item{selection_covariates}{vector of covariate names in data set that predict trial participation}
 
@@ -26,12 +17,5 @@ trim_pop(trial, covariates, data, just_population = FALSE)
 \code{trim_pop} returns a data frame, where the target population covariates do not exceed the bounds of the trial covariates
 }
 \description{
-<<<<<<< HEAD
 Subset Population so Population Covariates are within bounds of Trial Covariates
-=======
-Trim target population covariates to be within bounds of trial
-}
-\examples{
-trim_pop(trial,covariates, data = ctn_data)
->>>>>>> 9556e35d29cc067f2a5261ef6c3024119ac2d1d4
 }
