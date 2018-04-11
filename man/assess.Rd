@@ -4,6 +4,7 @@
 \alias{assess}
 \title{Assess Generalizability of Randomized Trial to Population}
 \usage{
+<<<<<<< HEAD
 assess(trial, selection_covariates, data, selection_method = "lr",
   is_data_disjoint = TRUE, trim_pop = TRUE)
 }
@@ -11,14 +12,27 @@ assess(trial, selection_covariates, data, selection_method = "lr",
 \item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}
 
 \item{selection_covariates}{vector of covariate names in data set that predict trial participation}
+=======
+assess(trial, selection_covariates, data, method = "lr", trim.pop = TRUE,
+  is.data.disjoint = TRUE)
+}
+\arguments{
+\item{data}{a data frame containing the variables specified in the model}
+>>>>>>> 9556e35d29cc067f2a5261ef6c3024119ac2d1d4
 
 \item{data}{data frame comprised of "stacked" trial and target population data}
 
 \item{selection_method}{method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")}
 
+<<<<<<< HEAD
 \item{is_data_disjoint}{logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.}
 
 \item{trim_pop}{logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.}
+=======
+\item{is.data.disjoint}{logical, if TRUE - trial and population data are considered independent.  If FALSE - trial is proper subset of population data.  See details for implications on weighting methods.}
+
+\item{formula}{an object of class "formula". The formula specifying the model for trial participation.  Lefthand side should be a binary variable indicating trial membership, and righthand side should contain pre-treatment covariates measured in data set.}
+>>>>>>> 9556e35d29cc067f2a5261ef6c3024119ac2d1d4
 }
 \value{
 \code{generalize} returns an object of the class "generalize"
