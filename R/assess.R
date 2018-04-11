@@ -53,9 +53,37 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
 
   g_index = gen_index(participation_probs$probs_trial, participation_probs$probs_population)
 
+  cov_tab = covariate_table(trial, selection_covariates, data)
+
+  n_trial = nrow(data[which(data[,trial] == 1),])
+  n_pop = nrow(data[which(data[,trial] == 0),])
+
   out = list(
+    g_index = g_index,
+    selection_method = selection_method,
+    covariate_table = cov_tab,
+    n_trial = n_trial,
+    n_pop = n_pop,
+    trim_pop = trim_pop,
     n_excluded = n_excluded,
-    g_index = g_index)
+    selection_covariates = selection_covariates
+    )
+
+  class(out) = "generalize_assess"
 
   return(out)
+}
+
+print.generalize_assess <- function(x,...){
+  cat("A generalize_assess object\n")
+  cat(paste0(" - probability of trial participation method: ", x$selection_method, "\n"))
+  cat(paste0(" - sample size of trial: ", x$n_trial, "\n"))
+  cat(paste0(" - size of population: ", x$n_pop, "\n"))
+  cat(paste0(" - common covariates included: ", paste(x$selection_covariates, collapse = ", "), "\n"))
+  cat(paste0(" - was population trimmed according to trial covariate bounds?: ", ifelse(x$trim_pop == TRUE, "Yes", "No"), "\n"))
+  if(x$trim_pop == TRUE){
+    cat(paste0("    - number excluded from population data: ", x$n_excluded, "\n"))
+    }
+
+  invisible(x)
 }

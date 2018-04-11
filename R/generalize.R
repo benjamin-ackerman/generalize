@@ -115,6 +115,11 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   colnames(result.tab) = c("Estimate","Std. Error","95% CI Lower","95% CI Upper")
   row.names(result.tab) = c("SATE","TATE")
 
+
+  ##### sample size of trial and population #####
+  n_trial = nrow(data[which(data[,trial] == 1),])
+  n_pop = nrow(data[which(data[,trial] == 0),])
+
   ##### Items to save to "generalize" object #####
   out = list(
     result.tab = result.tab,
@@ -122,7 +127,8 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     g_index = g_index,
     outcome = outcome,
     treatment = treatment,
-    trial = trial,
+    n_trial = n_trial,
+    n_pop = n_pop,
     selection_covariates = selection_covariates,
     method = method,
     selection_method = selection_method,
