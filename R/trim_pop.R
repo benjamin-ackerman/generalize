@@ -1,21 +1,13 @@
 ## Output: something that documents how many excluded, summarizes the "table 1" of covariate means for included/excluded
 ## Continuous variables: allow for some amount of "wiggle room" - threshold is not min or max
 
-<<<<<<< HEAD
 #' Subset Population so Population Covariates are within bounds of Trial Covariates
-=======
-#' Subset Population so Covariates are within bounds of Trial Covariates
->>>>>>> 9556e35d29cc067f2a5261ef6c3024119ac2d1d4
 #'
 #' @param trial variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)
 #' @param selection_covariates vector of covariate names in data set that predict trial participation
 #' @param data data frame comprised of "stacked" trial and target population data
 #' @return \code{trim_pop} returns a data frame, where the target population covariates do not exceed the bounds of the trial covariates
 #' @examples
-<<<<<<< HEAD
-=======
-#' trim_pop(trial,selection_covariates = c("age","sex","race"), data = ctn_data)
->>>>>>> 9556e35d29cc067f2a5261ef6c3024119ac2d1d4
 
 trim_pop <- function(trial, selection_covariates, data){
 
@@ -28,11 +20,7 @@ trim_pop <- function(trial, selection_covariates, data){
     stop("Not all covariates listed are variables in the data provided!",call. = FALSE)
   }
 
-<<<<<<< HEAD
   if(!length(na.omit(unique(data[,trial]))) == 2){
-=======
-  if(!length(unique(data[,trial])) == 2){
->>>>>>> 9556e35d29cc067f2a5261ef6c3024119ac2d1d4
     stop("Trial Membership variable not binary", call. = FALSE)
   }
 
