@@ -18,7 +18,7 @@
 #' @examples
 
 weighting = function(outcome, treatment, trial, selection_covariates, data, selection_method = "lr",
-                       is_data_disjoint = TRUE, trim_pop = TRUE){
+                       is_data_disjoint = TRUE, trim_pop = FALSE){
 
   ### Make input method lower case ###
   selection_method = tolower(selection_method)
@@ -27,11 +27,19 @@ weighting = function(outcome, treatment, trial, selection_covariates, data, sele
   if (!is.data.frame(data)) {
     stop("Data must be a data.frame.", call. = FALSE)}
 
+  if(anyNA(match(outcome,names(data)))){
+    stop("Outcome is not a variable in the data provided!",call. = FALSE)
+  }
+
+  if(anyNA(match(treatment,names(data)))){
+    stop("Treatment is not a variable in the data provided!",call. = FALSE)
+  }
+
   if(anyNA(match(selection_covariates,names(data)))){
     stop("Not all covariates listed are variables in the data provided!",call. = FALSE)
   }
 
-  if(!length(unique(data[,trial])) == 2){
+  if(!length(na.omit(unique(data[,trial]))) == 2){
     stop("Trial Membership variable not binary", call. = FALSE)
   }
 
@@ -76,8 +84,10 @@ weighting = function(outcome, treatment, trial, selection_covariates, data, sele
   }
 
   participation_probs = list(probs_population = ps[which(data[,trial]==0)],
-                             probs_trial = ps[which(data[,trial]==0)])
+                             probs_trial = ps[which(data[,trial]==1)])
 
+  if(is.null(outcome) & is.null(treatment)){TATE = NULL}
+  else{
   ##### ESTIMATE POPULATION AVERAGE TREATMENT EFFECT #####
   TATE_model = lm(as.formula(paste(outcome,treatment,sep="~")),data = data, weights = weights)
 
@@ -87,11 +97,14 @@ weighting = function(outcome, treatment, trial, selection_covariates, data, sele
   TATE_CI_l = TATE - 1.96*TATE_se
   TATE_CI_u = TATE + 1.96*TATE_se
 
+  TATE = c(TATE, TATE_se, TATE_CI_l, TATE_CI_u)
+  }
+
   ##### Items to return out #####
   out = list(method = selection_method,
              participation_probs = participation_probs,
              weights = data$weights,
-             TATE = c(TATE, TATE_se, TATE_CI_l, TATE_CI_u))
+             TATE = TATE)
 
   return(out)
 }

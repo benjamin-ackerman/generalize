@@ -20,7 +20,7 @@ trim_pop <- function(trial, selection_covariates, data){
     stop("Not all covariates listed are variables in the data provided!",call. = FALSE)
   }
 
-  if(!length(unique(data[,trial])) == 2){
+  if(!length(na.omit(unique(data[,trial]))) == 2){
     stop("Trial Membership variable not binary", call. = FALSE)
   }
 

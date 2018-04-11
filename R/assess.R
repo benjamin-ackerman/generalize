@@ -1,3 +1,5 @@
+### MAY NOT NEED THIS FUNCTION!!!!
+
 #' Assess Generalizability of Randomized Trial to Population
 #'
 #' @param trial variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)
@@ -10,7 +12,7 @@
 #' @examples
 
 assess = function(trial, selection_covariates, data, selection_method = "lr",
-                  is_data_disjoint = TRUE, trim_pop = TRUE){
+                  is_data_disjoint = TRUE, trim_pop = FALSE){
 
   ##### make methods lower case #####
   selection_method = tolower(selection_method)
@@ -24,7 +26,7 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
     stop("Not all covariates listed are variables in the data provided!",call. = FALSE)
   }
 
-  if(!length(unique(data[,trial])) == 2){
+  if(!length(na.omit(unique(data[,trial]))) == 2){
     stop("Trial Membership variable not binary", call. = FALSE)
   }
 
@@ -36,39 +38,26 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
     stop("Invalid weighting method!",call. = FALSE)
   }
 
-
   ##### Clean up data from missing values #####
-  data = data[rownames(na.omit(data[,all.vars(formula)])),]
+  #data = data[rownames(na.omit(data[,c(trial,selection_covariates)])),]
+
+  if(trim_pop == FALSE){n_excluded = NULL}
 
   if(trim_pop == TRUE){
-    trimmed_data = trim_pop(formula, data = data)$trimmed_data
-
-    ##### Find number of population members excluded from trimming #####
-    n_excluded = trim_pop(formula, data = data)$n_excluded
-
-    ##### Calculate participation probabilities, weights, generalizability index #####
-    gen_weights_object = gen_weights(formula, data = trimmed_data, method = selection_method, is_data_disjoint = is_data_disjoint)
-    participation_probs = gen_weights_object$participation_probs
-    weights = gen_weights_object$weights
-
-    g_index = gen_index(participation_probs$probs_trial, participation_probs$probs_population)
-
-    return(list(
-      n_excluded = n_excluded,
-      g_index = g_index
-    ))
+    n_excluded = trim_pop(trial, selection_covariates, data)$n_excluded
   }
 
-  if(trim_pop == FALSE){
-    ##### Calculate participation probabilities, weights, generalizability index #####
-    gen_weights_object = gen_weights(formula, data = data, method = selection_method, is_data_disjoint = is_data_disjoint)
-    participation_probs = gen_weights_object$participation_probs
-    weights = gen_weights_object$weights
+  weighting_object = weighting(outcome = NULL, treatment = NULL, trial, selection_covariates, data,
+                               selection_method, is_data_disjoint, trim_pop)
 
-    g_index = gen_index(participation_probs$probs_trial, participation_probs$probs_population)
+  participation_probs = weighting_object$participation_probs
+  weights = weighting_object$weights
 
-    return(list(
-      g_index = g_index
-    ))
-  }
+  g_index = gen_index(participation_probs$probs_trial, participation_probs$probs_population)
+
+  out = list(
+    n_excluded = n_excluded,
+    g_index = g_index)
+
+  return(out)
 }

@@ -1,3 +1,11 @@
+##### MAYBE USE THIS FOR EVERYTHING #####
+## Can output table of TATE results
+## Can generate participation probs and weights to be used for
+    ## generalizability index
+    ## plotting the distributions
+    ##
+### ***write code to make outcome and treatment null, then just use for assessing generalizability***
+
 #' Generalize Average Treatment Effect from Randomized Trial to Population
 #'
 #' @param outcome variable name denoting outcome
@@ -14,7 +22,7 @@
 
 
 generalize <- function(outcome, treatment, trial, selection_covariates, data, method = "weighting",
-                       selection_method = "lr", is_data_disjoint = TRUE, trim_pop = TRUE){
+                       selection_method = "lr", is_data_disjoint = TRUE, trim_pop = FALSE){
 
   ##### make methods lower case #####
   method = tolower(method)
@@ -25,19 +33,23 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     stop("Data must be a data.frame.", call. = FALSE)
   }
 
-  if(anyNA(match(outcome,names(data)))){
+  if(!is.null(outcome) & anyNA(match(outcome,names(data)))){
     stop("Outcome is not a variable in the data provided!",call. = FALSE)
   }
 
-  if(anyNA(match(treatment,names(data)))){
+  if(!is.null(treatment) & anyNA(match(treatment,names(data)))){
     stop("Treatment is not a variable in the data provided!",call. = FALSE)
+  }
+
+  if((!is.null(outcome) & is.null(treatment)) | (is.null(outcome) & !is.null(treatment))){
+    stop("Must specify either BOTH treatment and outcome, or NEITHER treatment not outcome", call. = FALSE)
   }
 
   if(anyNA(match(selection_covariates,names(data)))){
     stop("Not all covariates listed are variables in the data provided!",call. = FALSE)
   }
 
-  if(!length(unique(data[,trial])) == 2){
+  if(!length(na.omit(unique(data[,trial]))) == 2){
     stop("Trial Membership variable not binary", call. = FALSE)
   }
 
@@ -45,7 +57,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     stop("Sample Membership variable must be coded as `0` (not in trial) or `1` (in trial)",call. = FALSE)
   }
 
-  if(!length(unique(data[,treatment])) == 2){
+  if(!is.null(treatment) & !length(na.omit(unique(data[,treatment]))) == 2){
     stop("Treatment variable not binary", call. = FALSE)
   }
 
@@ -57,41 +69,79 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     stop("Invalid weighting method!",call. = FALSE)
   }
 
+
+  ##### trim population #####
+  if(trim_pop == FALSE){n_excluded = NULL}
+
+  if(trim_pop == TRUE){
+    n_excluded = trim_pop(trial, selection_covariates, data)$n_excluded
+    data = trim_pop(trial, selection_covariates, data)$trimmed_data
+  }
+
   ##### just keep the data we need #####
   data = data[rownames(na.omit(data[,c(trial,selection_covariates)])),c(outcome, treatment, trial, selection_covariates)]
 
-  ##### trim population #####
-  if(trim_pop == TRUE){
-    data = trim_pop(trial, covariates, data)
+  ##### Weighting object for diagnostics #####
+  weight_object = weighting(outcome, treatment, trial, selection_covariates, data, selection_method, is_data_disjoint, trim_pop)
+
+  participation_probs = weight_object$participation_probs
+  weights = weight_object$weights
+  g_index = gen_index(participation_probs$probs_population, participation_probs$probs_trial)
+
+  ##### Generalize results #####
+  ## If just assessing generalizability, don't create result table
+  if(is.null(outcome) & is.null(treatment)){
+    result.tab = NULL
   }
 
-  ##### estimate SATE #####
-  SATE_model = lm(as.formula(paste(outcome,treatment,sep="~")), data = data)
+  else{
+    ## First, estimate SATE
+    SATE_model = lm(as.formula(paste(outcome,treatment,sep="~")), data = data)
 
-  SATE = summary(SATE_model)$coefficients[treatment, "Estimate"]
-  SATE_se = summary(SATE_model)$coefficients[treatment, "Std. Error"]
+    SATE = summary(SATE_model)$coefficients[treatment, "Estimate"]
+    SATE_se = summary(SATE_model)$coefficients[treatment, "Std. Error"]
 
-  SATE_CI_l = SATE - 1.96*SATE_se
-  SATE_CI_u = SATE + 1.96*SATE_se
+    SATE_CI_l = SATE - 1.96*SATE_se
+    SATE_CI_u = SATE + 1.96*SATE_se
 
-  SATE_results = c(SATE,SATE_se,SATE_CI_l,SATE_CI_u)
+    SATE_results = c(SATE,SATE_se,SATE_CI_l,SATE_CI_u)
 
-  ##### Weighting Methods #####
-  if(method == "weighting"){
-    TATE_results = weighting(outcome, treatment, trial, selection_covariates, data, selection_method, is_data_disjoint, trim_pop)$TATE
+    ## Weighting results
+    if(method == "weighting"){
+      TATE_results = weight_object$TATE
+    }
+
+    ## BART results
+    if(method == "BART"){
+      TATE_results = "NOT READY YET"
+    }
+
+    ## TMLE results
+    if(method == "TMLE"){
+      TATE_results = tmle(outcome, treatment, trial, selection_covariates, data)$TATE
+    }
+
+    ## put together results table
+    result.tab = rbind(SATE_results, TATE_results)
+    colnames(result.tab) = c("Estimate","Std. Error","95% CI Lower","95% CI Upper")
+    row.names(result.tab) = c("SATE","TATE")
   }
 
-  if(method == "BART"){
-    TATE_results = "NOT READY YET"
-  }
+  ##### Items to save to "generalize" object #####
+  out = list(
+    result.tab = result.tab,
+    n_excluded = n_excluded,
+    g_index = g_index,
+    outcome = outcome,
+    treatment = treatment,
+    trial = trial,
+    selection_covariates = selection_covariates,
+    method = method,
+    selection_method = selection_method,
+    trim_pop = trim_pop
+  )
 
-  if(method == "TMLE"){
-    TATE_results = tmle(outcome, treatment, trial, selection_covariates, data)$TATE
-  }
+  class(out) = "generalize"
 
-  result.tab = rbind(SATE_results, TATE_results)
-  colnames(result.tab) = c("Estimate","Std. Error","95% CI Lower","95% CI Upper")
-  row.names(result.tab) = c("SATE","TATE")
-
-  return(result.tab)
+  return(out)
 }
