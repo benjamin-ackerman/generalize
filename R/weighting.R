@@ -82,8 +82,8 @@ weighting = function(outcome, treatment, trial, selection_covariates, data, sele
     data$weights = ifelse(data[,trial]==0,0,1/ps)
   }
 
-  participation_probs = list(probs_population = ps[which(data[,trial]==0)],
-                             probs_trial = ps[which(data[,trial]==1)])
+  participation_probs = list(population = ps[which(data[,trial]==0)],
+                             trial = ps[which(data[,trial]==1)])
 
   if(is.null(outcome) & is.null(treatment)){TATE = NULL}
   else{
@@ -101,8 +101,7 @@ weighting = function(outcome, treatment, trial, selection_covariates, data, sele
   }
 
   ##### Items to return out #####
-  out = list(method = selection_method,
-             participation_probs = participation_probs,
+  out = list(participation_probs = participation_probs,
              weights = data$weights,
              TATE = TATE)
 

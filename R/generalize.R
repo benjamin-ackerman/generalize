@@ -81,7 +81,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
 
   participation_probs = weight_object$participation_probs
   weights = weight_object$weights
-  g_index = gen_index(participation_probs$probs_population, participation_probs$probs_trial)
+  g_index = gen_index(participation_probs$population, participation_probs$trial)
 
   ##### Generalize results #####
   ## First, estimate SATE
