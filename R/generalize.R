@@ -123,16 +123,16 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   ##### Items to save to "generalize" object #####
   out = list(
     result.tab = result.tab,
-    n_excluded = n_excluded,
-    g_index = g_index,
     outcome = outcome,
     treatment = treatment,
-    n_trial = n_trial,
-    n_pop = n_pop,
-    selection_covariates = selection_covariates,
     method = method,
     selection_method = selection_method,
-    trim_pop = trim_pop
+    g_index = g_index,
+    n_trial = n_trial,
+    n_pop = n_pop,
+    trim_pop = trim_pop,
+    n_excluded = n_excluded,
+    selection_covariates = selection_covariates
   )
 
   class(out) = "generalize"
@@ -142,5 +142,25 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
 
 # S3 Methods (roxygenize voodoo)
 # summary.generalize #first parameter needs to be called "object"
-# print.generalize #first parameter needs to be called "x" (maybe use "invisible(x)")
 # print.summary.generalize
+
+print.generalize <- function(x,...){
+  cat("A generalize object\n")
+  cat(paste0(" - SATE: ", round(x$result.tab[1,1],3), "\n"))
+  cat(paste0(" - TATE: ", round(x$result.tab[2,1],3), "\n"))
+  cat(paste0(" - outcome variable: ", x$outcome, "\n"))
+  cat(paste0(" - treatment variable: ", x$treatment, "\n"))
+  cat(paste0(" - generalizability method: ", x$method, "\n"))
+  if(x$method == "weighting"){
+    cat(paste0("     - probability of trial participation method: ", x$selection_method, "\n"))
+  }
+  cat(paste0(" - sample size of trial: ", x$n_trial, "\n"))
+  cat(paste0(" - size of population: ", x$n_pop, "\n"))
+  cat(paste0(" - common covariates included: ", paste(x$selection_covariates, collapse = ", "), "\n"))
+  cat(paste0(" - was population trimmed according to trial covariate bounds?: ", ifelse(x$trim_pop == TRUE, "Yes", "No"), "\n"))
+  if(x$trim_pop == TRUE){
+    cat(paste0("    - number excluded from population data: ", x$n_excluded, "\n"))
+  }
+
+  invisible(x)
+}

@@ -13,7 +13,7 @@ covariate_table <- function(trial, selection_covariates, data){
   means.tab = expanded.data %>%
     dplyr::group_by(trial == 0) %>%
     dplyr::summarise_all(mean) %>%
-    select(-trial,-`trial == 0`,-`X.Intercept.`) %>%
+    dplyr::select(-trial,-`trial == 0`,-`X.Intercept.`) %>%
     t() %>%
     as.data.frame()
 
@@ -22,16 +22,16 @@ covariate_table <- function(trial, selection_covariates, data){
   sd.tab = expanded.data %>%
     dplyr::group_by(trial == 0) %>%
     dplyr::summarise_all(sd) %>%
-    select(-trial,-`trial == 0`,-`X.Intercept.`) %>%
+    dplyr::select(-trial,-`trial == 0`,-`X.Intercept.`) %>%
     t() %>%
     as.data.frame()
 
   names(sd.tab) = c("trial_sd","population_sd")
 
   covariate_table = means.tab %>%
-    bind_cols(sd.tab) %>%
-    mutate(ASMD = round(abs((trial - population)/population_sd),3)) %>%
-    select(trial, population, ASMD)
+    dplyr::bind_cols(sd.tab) %>%
+    dplyr::mutate(ASMD = round(abs((trial - population)/population_sd),3)) %>%
+    dplyr::select(trial, population, ASMD)
 
   row.names(covariate_table) = setdiff(names(expanded.data),c("trial","X.Intercept."))
 
