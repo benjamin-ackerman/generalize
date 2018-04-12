@@ -120,6 +120,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     TATE = TATE_results,
     outcome = outcome,
     treatment = treatment,
+    trial = trial,
     method = method,
     selection_method = selection_method,
     g_index = g_index,
@@ -129,7 +130,8 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     n_excluded = n_excluded,
     selection_covariates = selection_covariates,
     #covariate_table = cov_tab,
-    data = data_output
+    data = data_output,
+    is_data_disjoint = is_data_disjoint
   )
 
   class(out) = "generalize"
