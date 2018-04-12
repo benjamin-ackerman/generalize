@@ -58,7 +58,9 @@ tmle <- function(outcome, # variable name
   # CI = paste0("(",round(tmle.model$estimate$OR$CI[1],2),
   #             "-",round(tmle.model$estimate$OR$CI[2],2),")")
 
-  out = list(TATE = c(TATE, TATE_se, TATE_CI_l, TATE_CI_u))
+  TATE = list(estimate = TATE, se = TATE_se, CI_l = TATE_CI_l, CI_u = TATE_CI_u)
+
+  out = list(TATE = TATE)
 
   return(out)
 }

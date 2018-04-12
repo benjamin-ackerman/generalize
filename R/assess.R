@@ -104,8 +104,6 @@ summary.generalize_assess <- function(object,...){
 
   selection_formula = paste0(object$trial_name," ~ ",paste(object$selection_covariates, collapse = " + "))
 
-
-
   out = list(
     selection_formula = selection_formula,
     selection_method = selection_method_name[selection_method == object$selection_method],

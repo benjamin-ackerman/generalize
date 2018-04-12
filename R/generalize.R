@@ -93,7 +93,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   SATE_CI_l = SATE - 1.96*SATE_se
   SATE_CI_u = SATE + 1.96*SATE_se
 
-  SATE_results = c(SATE,SATE_se,SATE_CI_l,SATE_CI_u)
+  SATE_results = list(estimate = SATE,se = SATE_se,CI_l = SATE_CI_l, CI_u = SATE_CI_u)
 
   ## Weighting results
   if(method == "weighting"){
@@ -110,19 +110,18 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     TATE_results = tmle(outcome, treatment, trial, selection_covariates, data)$TATE
   }
 
-  ## put together results table
-  result.tab = rbind(SATE_results, TATE_results)
-  colnames(result.tab) = c("Estimate","Std. Error","95% CI Lower","95% CI Upper")
-  row.names(result.tab) = c("SATE","TATE")
-
-
   ##### sample size of trial and population #####
   n_trial = nrow(data[which(data[,trial] == 1),])
   n_pop = nrow(data[which(data[,trial] == 0),])
 
+  cov_tab = covariate_table(trial, selection_covariates, data)
+
+  data_output = data[,c(outcome, treatment, trial, selection_covariates)]
+
   ##### Items to save to "generalize" object #####
   out = list(
-    result.tab = result.tab,
+    SATE = SATE_results,
+    TATE = TATE_results,
     outcome = outcome,
     treatment = treatment,
     method = method,
@@ -132,7 +131,9 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     n_pop = n_pop,
     trim_pop = trim_pop,
     n_excluded = n_excluded,
-    selection_covariates = selection_covariates
+    selection_covariates = selection_covariates,
+    covariate_table = cov_tab,
+    data = data_output
   )
 
   class(out) = "generalize"
@@ -146,8 +147,8 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
 
 print.generalize <- function(x,...){
   cat("A generalize object\n")
-  cat(paste0(" - SATE: ", round(x$result.tab[1,1],3), "\n"))
-  cat(paste0(" - TATE: ", round(x$result.tab[2,1],3), "\n"))
+  cat(paste0(" - SATE: ", round(x$SATE$estimate,3), "\n"))
+  cat(paste0(" - TATE: ", round(x$TATE$estimate,3), "\n"))
   cat(paste0(" - outcome variable: ", x$outcome, "\n"))
   cat(paste0(" - treatment variable: ", x$treatment, "\n"))
   cat(paste0(" - generalizability method: ", x$method, "\n"))
@@ -161,6 +162,52 @@ print.generalize <- function(x,...){
   if(x$trim_pop == TRUE){
     cat(paste0("    - number excluded from population data: ", x$n_excluded, "\n"))
   }
+
+  invisible(x)
+}
+
+summary.generalize <- function(object,...){
+  ## put together results table
+  result.tab = rbind(unlist(object$SATE), unlist(object$TATE))
+  colnames(result.tab) = c("Estimate","Std. Error","95% CI Lower","95% CI Upper")
+  row.names(result.tab) = c("SATE","TATE")
+
+  ## give full names to methods
+  method_name = c("Weighting", "TMLE", "BART")
+  method = c("weighting","tmle","bart")
+
+  selection_method_name = c("Logistic Regression","Random Forests","Lasso")
+  selection_method = c("lr","rf","lasso")
+
+  out = object
+  out$result.tab = result.tab
+  out$method = method_name[out$method == method]
+  out$selection_method = selection_method_name[out$selection_method == selection_method]
+
+  class(out) = "summary.generalize"
+
+  return(out)
+}
+
+print.summary.generalize <- function(x,...){
+  cat("Average Treatment Effect Estimates: \n \n")
+
+  print(x$result.tab)
+
+  cat("\n")
+  cat(paste0("TATE estimated by ",x$method, "\n"))
+  if(x$method == "Weighting"){
+    cat(paste0("Weights estimated by ", x$selection_method,"\n"))
+  }
+
+  cat("============================================ \n")
+  cat("Covariate Distributions: \n \n")
+  if(x$trim_pop == TRUE){
+    cat("Population data were trimmed for covariates to not exceed trial covariate bounds \n")
+    cat(paste0("Number excluded from population: ", x$n_excluded ,"\n \n"))
+  }
+  cat(paste0("Generalizability Index: ", round(x$g_index,3), "\n"))
+  print(round(x$covariate_table,4))
 
   invisible(x)
 }

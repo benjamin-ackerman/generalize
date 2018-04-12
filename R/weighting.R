@@ -97,7 +97,7 @@ weighting = function(outcome, treatment, trial, selection_covariates, data, sele
   TATE_CI_l = TATE - 1.96*TATE_se
   TATE_CI_u = TATE + 1.96*TATE_se
 
-  TATE = c(TATE, TATE_se, TATE_CI_l, TATE_CI_u)
+  TATE = list(estimate = TATE, se = TATE_se, CI_l = TATE_CI_l, CI_u = TATE_CI_u)
   }
 
   ##### Items to return out #####
