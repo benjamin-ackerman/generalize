@@ -5,7 +5,7 @@
 \title{Assess Generalizability of Randomized Trial to Population}
 \usage{
 assess(trial, selection_covariates, data, selection_method = "lr",
-  is_data_disjoint = TRUE, trim_pop = TRUE)
+  is_data_disjoint = TRUE, trim_pop = FALSE)
 }
 \arguments{
 \item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}
@@ -21,7 +21,7 @@ assess(trial, selection_covariates, data, selection_method = "lr",
 \item{trim_pop}{logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.}
 }
 \value{
-\code{generalize} returns an object of the class "generalize"
+\code{assess} returns an object of the class "generalize_assess"
 }
 \description{
 Assess Generalizability of Randomized Trial to Population

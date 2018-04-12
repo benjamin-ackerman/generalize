@@ -6,7 +6,7 @@
 #' @param selection_method method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")
 #' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.
 #' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
-#' @return \code{generalize} returns an object of the class "generalize"
+#' @return \code{assess} returns an object of the class "generalize_assess"
 #' @examples
 
 assess = function(trial, selection_covariates, data, selection_method = "lr",

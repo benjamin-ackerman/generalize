@@ -138,7 +138,6 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   class(out) = "generalize"
 
   return(out)
-  #invisible(out) --> returns output but doesn't print anything
 }
 
 # S3 Methods (roxygenize voodoo)
