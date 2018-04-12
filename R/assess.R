@@ -43,6 +43,7 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
 
   if(trim_pop == TRUE){
     n_excluded = trim_pop(trial, selection_covariates, data)$n_excluded
+    data = trim_pop(trial, selection_covariates, data)$trimmed_data
   }
 
   weighting_object = weighting(outcome = NULL, treatment = NULL, trial, selection_covariates, data,
@@ -51,12 +52,14 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
   participation_probs = weighting_object$participation_probs
   weights = weighting_object$weights
 
-  g_index = gen_index(participation_probs$probs_trial, participation_probs$probs_population)
+  g_index = gen_index(participation_probs$trial, participation_probs$population)
 
   cov_tab = covariate_table(trial, selection_covariates, data)
 
   n_trial = nrow(data[which(data[,trial] == 1),])
   n_pop = nrow(data[which(data[,trial] == 0),])
+
+  data_output = data[,c(trial, selection_covariates)]
 
   out = list(
     g_index = g_index,
@@ -66,7 +69,11 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
     n_pop = n_pop,
     trim_pop = trim_pop,
     n_excluded = n_excluded,
-    selection_covariates = selection_covariates
+    selection_covariates = selection_covariates,
+    trial_name = trial,
+    participation_probs = participation_probs,
+    weights = weights,
+    data = data_output
     )
 
   class(out) = "generalize_assess"
@@ -86,4 +93,38 @@ print.generalize_assess <- function(x,...){
     }
 
   invisible(x)
+}
+
+summary.generalize_assess <- function(object,...){
+  selection_method_name = c("Logistic Regression","Random Forests","Lasso")
+  selection_method = c("lr","rf","lasso")
+  prob_dist_table = rbind(summary(object$participation_probs$trial),
+                          summary(object$participation_probs$population))
+  row.names(prob_dist_table) = paste0(c("Trial","Population"), " (n = ", c(object$n_trial,object$n_pop),")")
+
+  selection_formula = paste0(object$trial_name," ~ ",paste(object$selection_covariates, collapse = " + "))
+
+  cat("Probability of Trial Participation: \n \n")
+  cat(paste0(selection_formula," \n \n"))
+  cat(paste0("Estimated by ",selection_method_name[selection_method == object$selection_method], "\n"))
+  cat(paste0("Generalizability Index: ", round(object$g_index,3), "\n \n"))
+  print(prob_dist_table)
+  cat("\n")
+  cat("============================================ \n")
+  cat("Covariate Distributions: \n \n")
+  if(object$trim_pop == TRUE){
+    cat("Population data were trimmed for covariates to not exceed trial covariate bounds \n")
+    cat(paste0("Number excluded from population: ", object$n_excluded ,"\n"))
+  }
+  print(round(object$covariate_table,4))
+
+  out = list(
+    selection_formula = selection_formula,
+    selection_method = selection_method_name[selection_method == object$selection_method],
+    g_index = round(object$g_index,3),
+    prob_dist_table = prob_dist_table,
+    covariate_table = round(object$covariate_table, 4)
+  )
+
+  invisible(out)
 }

@@ -57,6 +57,9 @@ trim_pop <- function(trial, selection_covariates, data){
 
   trimmed_data = data[which(!rownames(data) %in% missing_rows),]
 
+  ##### get rid of unused levels from factors #####
+  trimmed_data = droplevels(trimmed_data)
+
   ##### number of rows in population data excluded #####
   n_excluded = nrow(data) - nrow(trimmed_data)
 

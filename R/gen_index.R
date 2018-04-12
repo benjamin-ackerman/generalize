@@ -5,7 +5,6 @@
 #' @param dat1B vector of probabilities of trial participation among individuals in the trial
 #' @param dat2B vector of probabilities of trial participation among individuals in the population
 #' @return the generalizability index, a value between 0 and 1, where scores greater than 1 indicate greater similarity (see Tipton paper for description)
-#' @examples
 
 gen_index <- function(dat1B,dat2B) {
   #kernel density
