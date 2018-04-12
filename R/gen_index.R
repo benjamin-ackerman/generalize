@@ -1,4 +1,4 @@
-### Maybe this will be one piece of a larger diagnostic function
+##### CITE BETH TIPTON'S PAPER IN THE DOCUMENTATION #####
 
 #' Calculate `generalizability index` to describe how similar or different trial is from population
 #'

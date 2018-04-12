@@ -9,12 +9,7 @@
 #' @return \code{generalize} returns an object of the class "generalize", containing the following: \code{TATE} (target population average treatment effect), \code{TATE_CI} (95% Confidence Interval for TATE).  If outcome is binary, reports TATE as risk difference as well as odds ratio, with accompanying CIs
 #' @examples
 
-tmle <- function(outcome, # variable name
-                 treatment, # variable name: must be binary indicator of treatment, values can be missing in population data
-                 trial, # variable name: must be binary indicator
-                 selection_covariates, # a vector of covariate names in data set that predict trial participation
-                 data # data frame containing data
-                 ){
+tmle <- function(outcome, treatment, trial, selection_covariates, data){
 
   data = trim_pop(trial = trial, covariates = selection_covariates, data = data)$trimmed_data
 

@@ -1,12 +1,4 @@
 
-##### MAYBE USE THIS FOR EVERYTHING #####
-## Can output table of TATE results
-## Can generate participation probs and weights to be used for
-    ## generalizability index
-    ## plotting the distributions
-    ## KEEP ASSESS
-### ***write code to make outcome and treatment null, then just use for assessing generalizability***
-
 #' Generalize Average Treatment Effect from Randomized Trial to Population
 #'
 #' @param outcome variable name denoting outcome
@@ -22,7 +14,7 @@
 #' @examples
 
 generalize <- function(outcome, treatment, trial, selection_covariates, data, method = "weighting",
-                       selection_method = "lr", is_data_disjoint = TRUE, trim_pop = TRUE){
+                       selection_method = "lr", is_data_disjoint = TRUE, trim_pop = FALSE){
 
   ##### make methods lower case #####
   method = tolower(method)
@@ -66,15 +58,16 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   }
 
   ##### trim population #####
-  if(trim_pop == FALSE){n_excluded = NULL}
+  if(trim_pop == FALSE){
+    n_excluded = NULL
+    ## just keep the data we need
+    data = data[rownames(na.omit(data[,c(trial,selection_covariates)])),c(outcome, treatment, trial, selection_covariates)]
+  }
 
   if(trim_pop == TRUE){
     n_excluded = trim_pop(trial, selection_covariates, data)$n_excluded
     data = trim_pop(trial, selection_covariates, data)$trimmed_data
   }
-
-  ##### just keep the data we need #####
-  data = data[rownames(na.omit(data[,c(trial,selection_covariates)])),c(outcome, treatment, trial, selection_covariates)]
 
   ##### Weighting object for diagnostics #####
   weight_object = weighting(outcome, treatment, trial, selection_covariates, data, selection_method, is_data_disjoint)
@@ -93,7 +86,10 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   SATE_CI_l = SATE - 1.96*SATE_se
   SATE_CI_u = SATE + 1.96*SATE_se
 
-  SATE_results = list(estimate = SATE,se = SATE_se,CI_l = SATE_CI_l, CI_u = SATE_CI_u)
+  SATE_results = list(estimate = SATE,
+                      se = SATE_se,
+                      CI_l = SATE_CI_l,
+                      CI_u = SATE_CI_u)
 
   ## Weighting results
   if(method == "weighting"){
@@ -114,7 +110,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   n_trial = nrow(data[which(data[,trial] == 1),])
   n_pop = nrow(data[which(data[,trial] == 0),])
 
-  cov_tab = covariate_table(trial, selection_covariates, data)
+  #cov_tab = covariate_table(trial, selection_covariates, data)
 
   data_output = data[,c(outcome, treatment, trial, selection_covariates)]
 
@@ -132,7 +128,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     trim_pop = trim_pop,
     n_excluded = n_excluded,
     selection_covariates = selection_covariates,
-    covariate_table = cov_tab,
+    #covariate_table = cov_tab,
     data = data_output
   )
 
@@ -141,12 +137,8 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   return(out)
 }
 
-# S3 Methods (roxygenize voodoo)
-# summary.generalize #first parameter needs to be called "object"
-# print.summary.generalize
-
 print.generalize <- function(x,...){
-  cat("A generalize object\n")
+  cat("A generalize object: \n")
   cat(paste0(" - SATE: ", round(x$SATE$estimate,3), "\n"))
   cat(paste0(" - TATE: ", round(x$TATE$estimate,3), "\n"))
   cat(paste0(" - outcome variable: ", x$outcome, "\n"))
@@ -155,9 +147,9 @@ print.generalize <- function(x,...){
   if(x$method == "weighting"){
     cat(paste0("     - probability of trial participation method: ", x$selection_method, "\n"))
   }
+  cat(paste0(" - common covariates included: ", paste(x$selection_covariates, collapse = ", "), "\n"))
   cat(paste0(" - sample size of trial: ", x$n_trial, "\n"))
   cat(paste0(" - size of population: ", x$n_pop, "\n"))
-  cat(paste0(" - common covariates included: ", paste(x$selection_covariates, collapse = ", "), "\n"))
   cat(paste0(" - was population trimmed according to trial covariate bounds?: ", ifelse(x$trim_pop == TRUE, "Yes", "No"), "\n"))
   if(x$trim_pop == TRUE){
     cat(paste0("    - number excluded from population data: ", x$n_excluded, "\n"))
@@ -168,9 +160,9 @@ print.generalize <- function(x,...){
 
 summary.generalize <- function(object,...){
   ## put together results table
-  result.tab = rbind(unlist(object$SATE), unlist(object$TATE))
-  colnames(result.tab) = c("Estimate","Std. Error","95% CI Lower","95% CI Upper")
-  row.names(result.tab) = c("SATE","TATE")
+  result_tab = rbind(unlist(object$SATE), unlist(object$TATE))
+  colnames(result_tab) = c("Estimate","Std. Error","95% CI Lower","95% CI Upper")
+  row.names(result_tab) = c("SATE","TATE")
 
   ## give full names to methods
   method_name = c("Weighting", "TMLE", "BART")
@@ -179,10 +171,20 @@ summary.generalize <- function(object,...){
   selection_method_name = c("Logistic Regression","Random Forests","Lasso")
   selection_method = c("lr","rf","lasso")
 
-  out = object
-  out$result.tab = result.tab
-  out$method = method_name[out$method == method]
-  out$selection_method = selection_method_name[out$selection_method == selection_method]
+  ## build outcome formula
+  outcome_formula = paste0(object$outcome, " ~ ", object$treatment)
+
+  out = list(
+    outcome_formula = outcome_formula,
+    result_tab = result_tab,
+    method = method_name[object$method == method],
+    selection_method = selection_method_name[object$selection_method == selection_method],
+    n_trial = object$n_trial,
+    n_pop = object$n_pop,
+    trim_pop = object$trim_pop,
+    n_excluded = object$n_excluded,
+    g_index = object$g_index
+  )
 
   class(out) = "summary.generalize"
 
@@ -191,23 +193,27 @@ summary.generalize <- function(object,...){
 
 print.summary.generalize <- function(x,...){
   cat("Average Treatment Effect Estimates: \n \n")
-
-  print(x$result.tab)
+  cat(paste0("Outcome Model: ",x$outcome_formula," \n \n"))
+  print(x$result_tab)
 
   cat("\n")
+  cat("============================================ \n")
   cat(paste0("TATE estimated by ",x$method, "\n"))
   if(x$method == "Weighting"){
     cat(paste0("Weights estimated by ", x$selection_method,"\n"))
   }
-
-  cat("============================================ \n")
-  cat("Covariate Distributions: \n \n")
+  cat("\n")
+  cat(paste0("Trial sample size: ",x$n_trial,"\n"))
+  cat(paste0("Population size: ",x$n_pop,"\n"))
   if(x$trim_pop == TRUE){
     cat("Population data were trimmed for covariates to not exceed trial covariate bounds \n")
-    cat(paste0("Number excluded from population: ", x$n_excluded ,"\n \n"))
+    cat(paste0("Number excluded from population: ", x$n_excluded ,"\n"))
   }
+  cat("\n")
   cat(paste0("Generalizability Index: ", round(x$g_index,3), "\n"))
-  print(round(x$covariate_table,4))
+
+  #cat("Covariate Distributions: \n \n")
+  #print(round(x$covariate_table,4))
 
   invisible(x)
 }

@@ -46,11 +46,11 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
     data = trim_pop(trial, selection_covariates, data)$trimmed_data
   }
 
-  weighting_object = weighting(outcome = NULL, treatment = NULL, trial, selection_covariates, data,
+  weight_object = weighting(outcome = NULL, treatment = NULL, trial, selection_covariates, data,
                                selection_method, is_data_disjoint)
 
-  participation_probs = weighting_object$participation_probs
-  weights = weighting_object$weights
+  participation_probs = weight_object$participation_probs
+  weights = weight_object$weights
 
   g_index = gen_index(participation_probs$trial, participation_probs$population)
 
@@ -82,11 +82,11 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
 }
 
 print.generalize_assess <- function(x,...){
-  cat("A generalize_assess object\n")
+  cat("A generalize_assess object: \n")
   cat(paste0(" - probability of trial participation method: ", x$selection_method, "\n"))
+  cat(paste0(" - common covariates included: ", paste(x$selection_covariates, collapse = ", "), "\n"))
   cat(paste0(" - sample size of trial: ", x$n_trial, "\n"))
   cat(paste0(" - size of population: ", x$n_pop, "\n"))
-  cat(paste0(" - common covariates included: ", paste(x$selection_covariates, collapse = ", "), "\n"))
   cat(paste0(" - was population trimmed according to trial covariate bounds?: ", ifelse(x$trim_pop == TRUE, "Yes", "No"), "\n"))
   if(x$trim_pop == TRUE){
     cat(paste0("    - number excluded from population data: ", x$n_excluded, "\n"))
@@ -120,7 +120,7 @@ summary.generalize_assess <- function(object,...){
 
 print.summary.generalize_assess <- function(x,...){
   cat("Probability of Trial Participation: \n \n")
-  cat(paste0(x$selection_formula," \n \n"))
+  cat(paste0("Selection Model: ",x$selection_formula," \n \n"))
   print(x$prob_dist_table)
   cat("\n")
   cat(paste0("Estimated by ",x$selection_method, "\n"))

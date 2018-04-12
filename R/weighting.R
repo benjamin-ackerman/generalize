@@ -1,9 +1,3 @@
-## DONE: Parameter to specify what kind of weight you want (specifying to the "S = 1" or "S = 0 and 1" group) not disjoint: weight by inverse probability
-## THIS CREATES WEIGHTS: Separate the two tasks: 1 is create the weights, 1 is assessing similarities
-## Don't print anything from this, have it be the behind the scenes
-## Can use this to send to diagnostics, G-index, or generalize function
-## Diagnostics: covariate balance, weighting --> include some sort of density plot
-
 #' Estimate weights for generalizing ATE by predicting probability of trial participation
 #'
 #' @param outcome variable name denoting outcome
@@ -16,8 +10,8 @@
 #' @return
 #' @examples
 
-weighting = function(outcome, treatment, trial, selection_covariates, data, selection_method = "lr",
-                       is_data_disjoint = TRUE){
+weighting = function(outcome, treatment, trial, selection_covariates, data,
+                     selection_method = "lr", is_data_disjoint = TRUE){
 
   ### Make input method lower case ###
   selection_method = tolower(selection_method)
