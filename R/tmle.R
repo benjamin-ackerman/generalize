@@ -10,7 +10,7 @@
 
 tmle <- function(outcome, treatment, trial, selection_covariates, data){
 
-  data = trim_pop(trial = trial, covariates = selection_covariates, data = data)$trimmed_data
+  data = trim_pop(trial = trial, selection_covariates = selection_covariates, data = data)$trimmed_data
 
   formula = as.formula(paste(trial, paste(selection_covariates,collapse="+"),sep="~"))
 
@@ -33,8 +33,8 @@ tmle <- function(outcome, treatment, trial, selection_covariates, data){
 
   tmle.model <- tmle::tmle(Y=data[,outcome],
                               A=ifelse(!is.na(data[,treatment]),data[,treatment],0),
-                              W=data[,covariates],
-                              Delta=data[,trial_membership],
+                              W=data[,selection_covariates],
+                              Delta=data[,trial],
                               g1W=0.5,
                               family= tmle.family,
                               gbound=c(0,1),

@@ -12,9 +12,9 @@
 #' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
 #' @return \code{generalize} returns an object of the class "generalize"
 #' @examples
-#' generalize("studyretention", "treat", "trial", c("age","sex","race","ethnicity","marital_status"),data = meth_data)
-#' generalize("studyretention", "treat", "trial", c("age","sex","race","ethnicity","marital_status"),data = meth_data,method = "weighting",selection_method = "rf")
-#' generalize("studyretention", "treat", "trial", c("age","sex","race","ethnicity","marital_status"),data = meth_data,method = "tmle")
+#' generalize(outcome = "studyretention", treatment = "treat", trial = "trial", selection_covariates = c("age","sex","race","ethnicity","marital_status"),data = meth_data)
+#' generalize(outcome = "studyretention", treatment = "treat", trial = "trial", selection_covariates = c("age","sex","race","ethnicity","marital_status"),data = meth_data,method = "tmle")
+#' summary(generalize(outcome = "studyretention", treatment = "treat", trial = "trial", selection_covariates = c("age","sex","race","ethnicity","marital_status"), data = meth_data, method = "weighting", selection_method = "rf", trim_pop = TRUE))
 
 generalize <- function(outcome, treatment, trial, selection_covariates, data, method = "weighting",
                        selection_method = "lr", is_data_disjoint = TRUE, trim_pop = FALSE){
@@ -22,6 +22,11 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   ##### make methods lower case #####
   method = tolower(method)
   selection_method = tolower(selection_method)
+
+  ### If using TMLE, must trim target population
+  if(method == "tmle"){
+    trim_pop = TRUE
+  }
 
   ##### CHECKS #####
   if (!is.data.frame(data)) {
@@ -100,12 +105,12 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   }
 
   ## BART results
-  if(method == "BART"){
+  if(method == "bart"){
     TATE_results = "NOT READY YET"
   }
 
   ## TMLE results
-  if(method == "TMLE"){
+  if(method == "tmle"){
     TATE_results = tmle(outcome, treatment, trial, selection_covariates, data)$TATE
   }
 
