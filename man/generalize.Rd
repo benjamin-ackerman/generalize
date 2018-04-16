@@ -6,7 +6,7 @@
 \usage{
 generalize(outcome, treatment, trial, selection_covariates, data,
   method = "weighting", selection_method = "lr", is_data_disjoint = TRUE,
-  trim_pop = TRUE)
+  trim_pop = FALSE)
 }
 \arguments{
 \item{outcome}{variable name denoting outcome}

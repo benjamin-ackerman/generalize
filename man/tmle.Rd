@@ -7,17 +7,15 @@
 tmle(outcome, treatment, trial, selection_covariates, data)
 }
 \arguments{
-\item{outcome}{variable denoting outcome}
+\item{outcome}{variable name denoting outcome}
 
-\item{treatment}{variable denoting binary treatment assignment (ok if only available in trial, not population)}
+\item{treatment}{variable name denoting binary treatment assignment (ok if only available in trial, not population)}
 
-\item{data}{a data frame containing the variables specified in the model}
+\item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}
 
-\item{method}{choose method to generalize average treatment effect.  Default is "weighting" (weighting by the odds of participation probability).  Other methods supported are "bart" (Bayesian Additive Regression Trees - NOT READY YET) and "tmle" (Targeted Maximum Likelihood Estimation)}
+\item{selection_covariates}{vector of covariate names in data set that predict trial participation}
 
-\item{weight_method}{choose method to predict the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are random forests ("rf") and lasso ("lasso")}
-
-\item{outcome_formula}{an object of class "formula." Can specify an optional outcome model to include pre-treatment covariates.}
+\item{data}{data frame comprised of "stacked" trial and target population data}
 }
 \value{
 \code{generalize} returns an object of the class "generalize", containing the following: \code{TATE} (target population average treatment effect), \code{TATE_CI} (95% Confidence Interval for TATE).  If outcome is binary, reports TATE as risk difference as well as odds ratio, with accompanying CIs

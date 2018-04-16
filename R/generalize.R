@@ -12,6 +12,9 @@
 #' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
 #' @return \code{generalize} returns an object of the class "generalize"
 #' @examples
+#' generalize("studyretention", "treat", "trial", c("age","sex","race","ethnicity","marital_status"),data = meth_data)
+#' generalize("studyretention", "treat", "trial", c("age","sex","race","ethnicity","marital_status"),data = meth_data,method = "weighting",selection_method = "rf")
+#' generalize("studyretention", "treat", "trial", c("age","sex","race","ethnicity","marital_status"),data = meth_data,method = "tmle")
 
 generalize <- function(outcome, treatment, trial, selection_covariates, data, method = "weighting",
                        selection_method = "lr", is_data_disjoint = TRUE, trim_pop = FALSE){
@@ -219,3 +222,4 @@ print.summary.generalize <- function(x,...){
 
   invisible(x)
 }
+
