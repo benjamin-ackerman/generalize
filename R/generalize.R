@@ -115,9 +115,9 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   n_pop = nrow(data[which(data[,trial] == 0),])
 
   ##### if using weighting method, insert a weighted covariates table
-  cov_tab = NULL
+  weighted_cov_tab = NULL
   if(method == "weighting"){
-  cov_tab = covariate_table(trial = trial, selection_covariates = selection_covariates, data = data,
+  weighted_cov_tab = covariate_table(trial = trial, selection_covariates = selection_covariates, data = data,
                             weighted_table = TRUE, selection_method = selection_method, is_data_disjoint = is_data_disjoint)
   }
 
@@ -138,7 +138,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     trim_pop = trim_pop,
     n_excluded = n_excluded,
     selection_covariates = selection_covariates,
-    weighted_covariate_table = cov_tab,
+    weighted_covariate_table = weighted_cov_tab,
     data = data_output,
     is_data_disjoint = is_data_disjoint
   )

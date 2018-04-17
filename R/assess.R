@@ -54,6 +54,8 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
   g_index = gen_index(participation_probs$trial, participation_probs$population)
 
   cov_tab = covariate_table(trial, selection_covariates, data)
+  weighted_cov_tab = covariate_table(trial, selection_covariates, data,weighted_table = TRUE)
+
 
   n_trial = nrow(data[which(data[,trial] == 1),])
   n_pop = nrow(data[which(data[,trial] == 0),])
@@ -72,6 +74,7 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
     participation_probs = participation_probs,
     weights = weights,
     covariate_table = cov_tab,
+    weighted_covariate_table = weighted_cov_tab,
     data = data_output
     )
 
@@ -109,6 +112,7 @@ summary.generalize_assess <- function(object,...){
     g_index = round(object$g_index,3),
     prob_dist_table = prob_dist_table,
     covariate_table = round(object$covariate_table, 4),
+    weighted_covariate_table = round(object$weighted_covariate_table,4),
     trim_pop = object$trim_pop,
     n_excluded = object$n_excluded
   )
@@ -131,6 +135,5 @@ print.summary.generalize_assess <- function(x,...){
     cat(paste0("Number excluded from population: ", x$n_excluded ,"\n \n"))
   }
   print(round(x$covariate_table,4))
-
   invisible(x)
 }
