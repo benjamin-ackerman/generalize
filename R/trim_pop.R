@@ -31,9 +31,9 @@ trim_pop <- function(trial, selection_covariates, data){
   ##### subset trial data covariates #####
   trial_dat = data[which(data[,trial]==1),selection_covariates]
 
-  if(length(covariates)==1){
+  if(length(selection_covariates)==1){
     trial_dat = data.frame(trial_dat)
-    names(trial_dat) = covariates
+    names(trial_dat) = selection_covariates
     }
 
   ##### find covariate bounds in the trial #####

@@ -33,3 +33,8 @@ generalize(outcome, treatment, trial, selection_covariates, data,
 \description{
 Generalize Average Treatment Effect from Randomized Trial to Population
 }
+\examples{
+generalize(outcome = "studyretention", treatment = "treat", trial = "trial", selection_covariates = c("age","sex","race","ethnicity","marital_status"),data = meth_data)
+generalize(outcome = "studyretention", treatment = "treat", trial = "trial", selection_covariates = c("age","sex","race","ethnicity","marital_status"),data = meth_data,method = "tmle")
+summary(generalize(outcome = "studyretention", treatment = "treat", trial = "trial", selection_covariates = c("age","sex","race","ethnicity","marital_status"), data = meth_data, method = "weighting", selection_method = "rf", trim_pop = TRUE))
+}
