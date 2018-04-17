@@ -114,7 +114,12 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   n_trial = nrow(data[which(data[,trial] == 1),])
   n_pop = nrow(data[which(data[,trial] == 0),])
 
-  #cov_tab = covariate_table(trial, selection_covariates, data)
+  ##### if using weighting method, insert a weighted covariates table
+  cov_tab = NULL
+  if(method == "weighting"){
+  cov_tab = covariate_table(trial = trial, selection_covariates = selection_covariates, data = data,
+                            weighted_table = TRUE, selection_method = selection_method, is_data_disjoint = is_data_disjoint)
+  }
 
   data_output = data[,c(outcome, treatment, trial, selection_covariates)]
 
@@ -133,7 +138,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     trim_pop = trim_pop,
     n_excluded = n_excluded,
     selection_covariates = selection_covariates,
-    #covariate_table = cov_tab,
+    weighted_covariate_table = cov_tab,
     data = data_output,
     is_data_disjoint = is_data_disjoint
   )
@@ -189,7 +194,8 @@ summary.generalize <- function(object,...){
     n_pop = object$n_pop,
     trim_pop = object$trim_pop,
     n_excluded = object$n_excluded,
-    g_index = object$g_index
+    g_index = object$g_index,
+    weighted_covariate_table = object$weighted_covariate_table
   )
 
   class(out) = "summary.generalize"
@@ -218,8 +224,11 @@ print.summary.generalize <- function(x,...){
   cat("\n")
   cat(paste0("Generalizability Index: ", round(x$g_index,3), "\n"))
 
-  #cat("Covariate Distributions: \n \n")
-  #print(round(x$covariate_table,4))
+  if(x$method == "Weighting"){
+    cat("\n")
+    cat("Covariate Distributions after Weighting: \n \n")
+    print(round(x$weighted_covariate_table,4))
+  }
 
   invisible(x)
 }
