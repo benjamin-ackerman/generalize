@@ -7,7 +7,6 @@
 #' @param data data frame comprised of "stacked" trial and target population data
 #' @param selection_method method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")
 #' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.
-# @examples
 
 weighting = function(outcome, treatment, trial, selection_covariates, data,
                      selection_method = "lr", is_data_disjoint = TRUE){

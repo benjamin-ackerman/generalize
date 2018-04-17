@@ -26,7 +26,3 @@ assess(trial, selection_covariates, data, selection_method = "lr",
 \description{
 Assess Generalizability of Randomized Trial to Population
 }
-\examples{
-assess(trial = "trial",selection_covariates = c("age","sex","race","ethnicity","marital_status","education","employment","methprior"), data = meth_data)
-summary(assess(trial = "trial",selection_covariates = c("age","sex","race","ethnicity","marital_status","education","employment","methprior"), data = meth_data, selection_method = "rf", trim_pop = TRUE))
-}

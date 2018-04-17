@@ -11,6 +11,9 @@ gen_index(dat1B, dat2B)
 
 \item{dat2B}{vector of probabilities of trial participation among individuals in the population}
 }
+\value{
+the generalizability index, a value between 0 and 1, where scores greater than 1 indicate greater similarity (see Tipton paper for description)
+}
 \description{
 Calculate `generalizability index` to describe how similar or different trial is from population
 }
