@@ -8,6 +8,8 @@
 #' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
 #' @return \code{assess} returns an object of the class "generalize_assess"
 # @examples
+# assess(trial = "trial",selection_covariates = c("age","sex","race","ethnicity","marital_status","education","employment","methprior"), data = meth_data)
+# summary(assess(trial = "trial",selection_covariates = c("age","sex","race","ethnicity","marital_status","education","employment","methprior"), data = meth_data, selection_method = "rf", trim_pop = TRUE))
 
 assess = function(trial, selection_covariates, data, selection_method = "lr",
                   is_data_disjoint = TRUE, trim_pop = FALSE){
