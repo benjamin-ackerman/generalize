@@ -4,7 +4,8 @@
 \alias{covariate_table}
 \title{Create Covariate Balance Table}
 \usage{
-covariate_table(trial, selection_covariates, data)
+covariate_table(trial, selection_covariates, data, weighted_table = FALSE,
+  selection_method = "lr", is_data_disjoint = TRUE)
 }
 \arguments{
 \item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}

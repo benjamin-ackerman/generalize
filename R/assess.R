@@ -6,10 +6,11 @@
 #' @param selection_method method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")
 #' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.
 #' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
+#' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
 #' @return \code{assess} returns an object of the class "generalize_assess"
 
 assess = function(trial, selection_covariates, data, selection_method = "lr",
-                  is_data_disjoint = TRUE, trim_pop = FALSE){
+                  is_data_disjoint = TRUE, trim_pop = FALSE,seed){
 
   ##### make methods lower case #####
   selection_method = tolower(selection_method)
@@ -46,7 +47,7 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
   }
 
   weight_object = weighting(outcome = NULL, treatment = NULL, trial, selection_covariates, data,
-                               selection_method, is_data_disjoint)
+                               selection_method, is_data_disjoint,seed)
 
   participation_probs = weight_object$participation_probs
   weights = weight_object$weights

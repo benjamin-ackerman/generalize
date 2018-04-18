@@ -2,3 +2,4 @@ packrat/lib*/
 .Rproj.user
 .Rdata
 .Rhistory
+packrat/src/

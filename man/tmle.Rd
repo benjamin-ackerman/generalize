@@ -4,7 +4,7 @@
 \alias{tmle}
 \title{TMLE}
 \usage{
-tmle(outcome, treatment, trial, selection_covariates, data)
+tmle(outcome, treatment, trial, selection_covariates, data, seed)
 }
 \arguments{
 \item{outcome}{variable name denoting outcome}
@@ -16,6 +16,8 @@ tmle(outcome, treatment, trial, selection_covariates, data)
 \item{selection_covariates}{vector of covariate names in data set that predict trial participation}
 
 \item{data}{data frame comprised of "stacked" trial and target population data}
+
+\item{seed}{numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).}
 }
 \value{
 \code{generalize} returns an object of the class "generalize", containing the following: \code{TATE} (target population average treatment effect), \code{TATE_CI} (95% Confidence Interval for TATE).  If outcome is binary, reports TATE as risk difference as well as odds ratio, with accompanying CIs

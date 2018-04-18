@@ -7,9 +7,17 @@
 #' @param data data frame comprised of "stacked" trial and target population data
 #' @param selection_method method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")
 #' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.
+#' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
 
 weighting = function(outcome, treatment, trial, selection_covariates, data,
-                     selection_method = "lr", is_data_disjoint = TRUE){
+                     selection_method = "lr", is_data_disjoint = TRUE,seed){
+
+  ##### set the seed #####
+  if(missing(seed)){
+    seed = 13783
+  }
+
+  set.seed(seed)
 
   ### Make input method lower case ###
   selection_method = tolower(selection_method)

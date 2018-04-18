@@ -6,8 +6,15 @@
 #' @param selection_covariates vector of covariate names in data set that predict trial participation
 #' @param data data frame comprised of "stacked" trial and target population data
 #' @return \code{generalize} returns an object of the class "generalize", containing the following: \code{TATE} (target population average treatment effect), \code{TATE_CI} (95% Confidence Interval for TATE).  If outcome is binary, reports TATE as risk difference as well as odds ratio, with accompanying CIs
+#' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
 
-tmle <- function(outcome, treatment, trial, selection_covariates, data){
+tmle <- function(outcome, treatment, trial, selection_covariates, data,seed){
+
+  ##### set the seed #####
+  if(missing(seed)){
+    seed = 13783
+  }
+  set.seed(seed)
 
   data = trim_pop(trial = trial, selection_covariates = selection_covariates, data = data)$trimmed_data
 

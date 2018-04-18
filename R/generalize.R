@@ -10,10 +10,11 @@
 #' @param selection_method method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")
 #' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.
 #' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
+#' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
 #' @return \code{generalize} returns an object of the class "generalize"
 
 generalize <- function(outcome, treatment, trial, selection_covariates, data, method = "weighting",
-                       selection_method = "lr", is_data_disjoint = TRUE, trim_pop = FALSE){
+                       selection_method = "lr", is_data_disjoint = TRUE, trim_pop = FALSE, seed){
 
   ##### make methods lower case #####
   method = tolower(method)
@@ -61,6 +62,10 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     stop("Invalid weighting method!",call. = FALSE)
   }
 
+  if(!missing(seed) & !is.numeric(seed)){
+    stop("seed must be numeric!,call. = FALSE")
+  }
+
   ##### trim population #####
   if(trim_pop == FALSE){
     n_excluded = NULL
@@ -74,7 +79,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   }
 
   ##### Weighting object for diagnostics #####
-  weight_object = weighting(outcome, treatment, trial, selection_covariates, data, selection_method, is_data_disjoint)
+  weight_object = weighting(outcome, treatment, trial, selection_covariates, data, selection_method, is_data_disjoint,seed)
 
   participation_probs = weight_object$participation_probs
   weights = weight_object$weights
@@ -107,7 +112,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
 
   ## TMLE results
   if(method == "tmle"){
-    TATE_results = tmle(outcome, treatment, trial, selection_covariates, data)$TATE
+    TATE_results = tmle(outcome, treatment, trial, selection_covariates, data,seed)$TATE
   }
 
   ##### sample size of trial and population #####

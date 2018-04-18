@@ -5,7 +5,7 @@
 \title{Assess Generalizability of Randomized Trial to Population}
 \usage{
 assess(trial, selection_covariates, data, selection_method = "lr",
-  is_data_disjoint = TRUE, trim_pop = FALSE)
+  is_data_disjoint = TRUE, trim_pop = FALSE, seed)
 }
 \arguments{
 \item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}
@@ -19,6 +19,8 @@ assess(trial, selection_covariates, data, selection_method = "lr",
 \item{is_data_disjoint}{logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.}
 
 \item{trim_pop}{logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.}
+
+\item{seed}{numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).}
 }
 \value{
 \code{assess} returns an object of the class "generalize_assess"
