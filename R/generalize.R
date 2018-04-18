@@ -62,9 +62,10 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     stop("Invalid weighting method!",call. = FALSE)
   }
 
-  if(!missing(seed) & !is.numeric(seed)){
+  if(!missing(seed)){
+    if(!is.numeric(seed)){
     stop("seed must be numeric!,call. = FALSE")
-  }
+  }}
 
   ##### trim population #####
   if(trim_pop == FALSE){

@@ -36,6 +36,10 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
     stop("Invalid weighting method!",call. = FALSE)
   }
 
+  if(!missing(seed)){
+    if(!is.numeric(seed)){
+      stop("seed must be numeric!,call. = FALSE")
+    }}
   ##### Clean up data from missing values #####
   #data = data[rownames(na.omit(data[,c(trial,selection_covariates)])),]
 
