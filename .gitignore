@@ -1,5 +1,5 @@
 packrat/lib*/
 .Rproj.user
 .Rdata
-.Rhistory
+*.Rhistory
 packrat/src/
