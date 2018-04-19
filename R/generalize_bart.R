@@ -6,9 +6,9 @@
 #' @param selection_covariates vector of covariate names in data set that predict trial participation
 #' @param data data frame comprised of "stacked" trial and target population data
 #' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
-#' @return \code{bart} returns a list of the TATE estimate, standard error, and 95% CI bounds
+#' @return \code{generalize_bart} returns a list of the TATE estimate, standard error, and 95\% CI bounds
 
-bart <- function(outcome, treatment, trial, selection_covariates, data,seed){
+generalize_bart <- function(outcome, treatment, trial, selection_covariates, data,seed){
 
   ##### set the seed #####
   if(missing(seed)){

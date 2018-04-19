@@ -108,12 +108,12 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
 
   ## BART results
   if(method == "bart"){
-    TATE_results = "NOT READY YET"
+    TATE_results = generalize_bart(outcome, treatment, trial, selection_covariates,data,seed)$TATE
   }
 
   ## TMLE results
   if(method == "tmle"){
-    TATE_results = tmle(outcome, treatment, trial, selection_covariates, data,seed)$TATE
+    TATE_results = generalize_tmle(outcome, treatment, trial, selection_covariates, data,seed)$TATE
   }
 
   ##### sample size of trial and population #####
