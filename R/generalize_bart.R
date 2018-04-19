@@ -22,7 +22,7 @@ generalize_bart <- function(outcome, treatment, trial, selection_covariates, dat
   # Prepare target population test set
   xtest = data[which(data[,trial] == 0),selection_covariates]
   xtest = rbind(xtest,xtest)
-  xtest[,treat] = rep(c(1,0),each= nrow(xtest)/2)
+  xtest[,treatment] = rep(c(1,0),each= nrow(xtest)/2)
 
   # Training data based on trial
   xtrain = data[which(data[,trial] == 1 & !is.na(data[,outcome])),c(treatment,selection_covariates)]

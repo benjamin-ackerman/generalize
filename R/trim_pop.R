@@ -60,7 +60,7 @@ trim_pop <- function(trial, selection_covariates, data){
   trimmed_data = droplevels(trimmed_data)
 
   ##### number of rows in population data excluded #####
-  n_excluded = nrow(data) - nrow(trimmed_data)
+  n_excluded = nrow(data[which(data[,trial]==0),]) - nrow(trimmed_data[which(trimmed_data[,trial]==0),])
 
   out = list(n_excluded = n_excluded,
              trimmed_data = trimmed_data,
