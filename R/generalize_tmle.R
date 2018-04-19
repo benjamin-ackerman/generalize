@@ -5,10 +5,11 @@
 #' @param trial variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)
 #' @param selection_covariates vector of covariate names in data set that predict trial participation
 #' @param data data frame comprised of "stacked" trial and target population data
+#' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.
 #' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
 #' @return \code{generalize_tmle} returns a list of the TATE estimate, standard error, and 95\% CI bounds
 
-generalize_tmle <- function(outcome, treatment, trial, selection_covariates, data,seed){
+generalize_tmle <- function(outcome, treatment, trial, selection_covariates, data,is_data_disjoint = TRUE,seed){
 
   ##### set the seed #####
   if(missing(seed)){
