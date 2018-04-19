@@ -12,6 +12,7 @@ Imports:
     dplyr,
     purrr,
     tmle,
+    BayesTree,
     randomForest,
     glmnet,
     magrittr

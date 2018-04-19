@@ -1,12 +1,12 @@
-#' TMLE
+#' TMLE for estimating TATE
 #'
 #' @param outcome variable name denoting outcome
 #' @param treatment variable name denoting binary treatment assignment (ok if only available in trial, not population)
 #' @param trial variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)
 #' @param selection_covariates vector of covariate names in data set that predict trial participation
 #' @param data data frame comprised of "stacked" trial and target population data
-#' @return \code{generalize} returns an object of the class "generalize", containing the following: \code{TATE} (target population average treatment effect), \code{TATE_CI} (95% Confidence Interval for TATE).  If outcome is binary, reports TATE as risk difference as well as odds ratio, with accompanying CIs
 #' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
+#' @return \code{tmle} returns a list of the TATE estimate, standard error, and 95% CI bounds
 
 tmle <- function(outcome, treatment, trial, selection_covariates, data,seed){
 
