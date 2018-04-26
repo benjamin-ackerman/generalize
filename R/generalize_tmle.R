@@ -39,13 +39,14 @@ generalize_tmle <- function(outcome, treatment, trial, selection_covariates, dat
   # }
 
   tmle.model <- tmle::tmle(Y=data[,outcome],
-                              A=ifelse(!is.na(data[,treatment]),data[,treatment],0),
-                              W=data[,selection_covariates],
-                              Delta=data[,trial],
-                              g1W=0.5,
-                              family= tmle.family,
-                              gbound=c(0,1),
-                              pDelta1=cbind(data$a0,data$a1)
+                           A=ifelse(!is.na(data[,treatment]),data[,treatment],0),
+                           W=data[,selection_covariates],
+                           Z=NULL,
+                           Delta=data[,trial],
+                           g1W=0.5,
+                           family= tmle.family,
+                           gbound=c(0,1),
+                           pDelta1=cbind(data$a0,data$a1)
                              )
 
   TATE = tmle.model$estimates$ATE$psi
