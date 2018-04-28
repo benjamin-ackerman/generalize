@@ -1,4 +1,4 @@
-Package: generalizeR
+Package: generalize
 Type: Package
 Title: Generalizing Average Treatment Effects from RCTs to Target Populations
 Version: 0.1.0
