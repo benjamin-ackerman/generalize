@@ -9,29 +9,45 @@ generalize(outcome, treatment, trial, selection_covariates, data,
   trim_pop = FALSE, seed)
 }
 \arguments{
-\item{outcome}{variable name denoting outcome}
+\item{outcome}{variable name denoting outcome (measured in trial, missing in population)}
 
-\item{treatment}{variable name denoting binary treatment assignment (ok if only available in trial, not population)}
+\item{treatment}{variable name denoting binary treatment assignment (measured in trial, missing in population)}
 
 \item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}
 
-\item{selection_covariates}{vector of covariate names in data set that predict trial participation}
+\item{selection_covariates}{vector of covariate names in data that predict trial participation}
 
 \item{data}{data frame comprised of "stacked" trial and target population data}
 
-\item{method}{method to generalize average treatment effect to the target population.  Default is "weighting" (weighting by participation probability).  Other methods supported are "BART" (Bayesian Additive Regression Trees - NOT READY YET) and "TMLE" (Targeted Maximum Likelihood Estimation)}
+\item{method}{method to generalize average treatment effect to the target population.  Default is "weighting" (weighting by trial participation probability).  Other methods currently supported are "BART" (Bayesian Additive Regression Trees) and "TMLE" (Targeted Maximum Likelihood Estimation)}
 
-\item{selection_method}{method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")}
+\item{selection_method}{If \code{method} = "weighting," specify method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods currently supported are Random Forests ("rf") and Lasso ("lasso")}
 
-\item{is_data_disjoint}{logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.}
+\item{is_data_disjoint}{logical. If TRUE, then trial and population data are considered disjoint data sources (individuals in trial are not individuals measured in the population dataset)}
 
-\item{trim_pop}{logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.}
+\item{trim_pop}{logical. If TRUE, then population data are subset to exclude individuals with covariates outside the ranges of trial covariates.}
 
-\item{seed}{numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).}
+\item{seed}{numeric. By default, the seed is set to 13783, otherwise can be specified.}
 }
 \value{
-\code{generalize} returns an object of the class "generalize"
+\code{generalize} returns an object of the class "generalize," which is a list containing the following components:
+\item{SATE}{a list containing the sample average treatment effect estimate (SATE), its standard error, and 95\% CI bounds}
+\item{TATE}{a list containing the target population average treatment effect estimate (TATE), its standard error, and 95\% CI bounds}
+\item{outcome}{name of the outcome variable}
+\item{treatment}{name of the treatment variable}
+\item{trial}{name of the trial membership indicator variable}
+\item{method}{method of generalizing the ATE used}
+\item{selection_method}{method of estimating the trial participation probabilities}
+\item{g_index}{Tipton's Generalizability Index}
+\item{n_trial}{trial data sample size}
+\item{n_pop}{population data sample size}
+\item{trim_pop}{logical}
+\item{n_excluded}{if \code{trim_pop} = TRUE, the number of individuals in the population excluded}
+\item{selection_covariates}{vector of covariate names}
+\item{weighted_covariate_table}{if \code{method} = "weighting", returns a covariate table by trial participation, where trial covariates are weighted}
+\item{data}{data used for analysis}
+\item{is_data_disjoint}{logical}
 }
 \description{
-Generalize Average Treatment Effect from Randomized Trial to Population
+Estimate population average treatment effects by generalizing randomized trial findings to a target population.
 }
