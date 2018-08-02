@@ -75,7 +75,7 @@ weighting = function(outcome, treatment, trial, selection_covariates, data,
 
   ### Generate Weights ###
   if(is_data_disjoint == TRUE){
-    data$weights = ifelse(data[,trial]==0,0,ps/(1-ps))
+    data$weights = ifelse(data[,trial]==0,0,(1-ps)/ps)
   }
 
   if(is_data_disjoint == FALSE){
