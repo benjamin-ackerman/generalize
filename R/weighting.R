@@ -73,6 +73,11 @@ weighting = function(outcome, treatment, trial, selection_covariates, data,
     ),newx=test.x,s="lambda.1se",type="response"))
   }
 
+  ### Set any participation probabilities of 0 in the trial to the minimum non-zero value ###
+  if(any(ps[which(data[,trial]==1)] == 0)){
+    ps[which(data[,trial] == 1 & ps == 0)] = min(ps[which(data[,trial] == 1 & ps != 0)], na.rm=TRUE)
+  }
+
   ### Generate Weights ###
   if(is_data_disjoint == TRUE){
     data$weights = ifelse(data[,trial]==0,0,(1-ps)/ps)
