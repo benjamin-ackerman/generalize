@@ -87,13 +87,17 @@ weighting = function(outcome, treatment, trial, selection_covariates, data,
     data$weights = ifelse(data[,trial]==0,0,1/ps)
   }
 
+  # Trim any of the weights if necessary
+  data$weights[which(data$weights == 0 & data[,trial] == 1)] = quantile(data$weights[which(data[,trial]==1)],0.01,na.rm=TRUE)
+
+
   participation_probs = list(population = ps[which(data[,trial]==0)],
                              trial = ps[which(data[,trial]==1)])
 
   if(is.null(outcome) & is.null(treatment)){TATE = NULL}
   else{
-  ##### ESTIMATE POPULATION AVERAGE TREATMENT EFFECT #####
 
+  ##### ESTIMATE POPULATION AVERAGE TREATMENT EFFECT #####
   TATE_model = lm(as.formula(paste(outcome,treatment,sep="~")),data = data, weights = weights)
 
   TATE = summary(TATE_model)$coefficients[treatment,"Estimate"]
