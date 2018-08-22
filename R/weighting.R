@@ -90,7 +90,6 @@ weighting = function(outcome, treatment, trial, selection_covariates, data,
   # Trim any of the weights if necessary
   data$weights[which(data$weights == 0 & data[,trial] == 1)] = quantile(data$weights[which(data[,trial]==1)],0.01,na.rm=TRUE)
 
-
   participation_probs = list(population = ps[which(data[,trial]==0)],
                              trial = ps[which(data[,trial]==1)])
 
