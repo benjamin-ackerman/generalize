@@ -1,4 +1,4 @@
-# generalize: an R package for estimating population effects from randomized trial data
+# `generalize`: an R package for estimating population effects from randomized trial data
 
 The "generalize" package contains two core functions: `assess` and `generalize`.
 
