@@ -41,7 +41,7 @@ covariate_table <- function(trial, selection_covariates, data, weighted_table = 
     data$weights = weighting(outcome = NULL, treatment = NULL, trial = trial,
                              selection_covariates = selection_covariates, data = data,
                              selection_method = selection_method, is_data_disjoint = is_data_disjoint)$weights
-    data$weights = ifelse(data$trial == 0, 1, data$weights)
+    data$weights = ifelse(data[,trial] == 0, 1, data$weights)
 
     expanded.data = data.frame(trial = data[,trial], model.matrix(~ -1 + ., data = data[,c(selection_covariates,"weights")]))
 
