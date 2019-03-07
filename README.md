@@ -21,10 +21,10 @@ The `generalize` package contains two core functions: `assess` and `generalize`.
 ### `assess`
 `Assess` evaluates similarities and differences between the trial sample and the target population based on a specified list of common covariates.  This is done in a few ways: 
 
-1. `assess` provides a **summary table of covariate means** in the trial and the population, along with absolute standardized mean differences (ASMD) between the two sources of data.
-2. `assess` estimates the **probability of trial participation** based on a vector of covariate names and specified method, and summarizes their distribution across the trial and target populations.  For this, logistic regression is the default method, but estimation using Random Forests or Lasso are currently supported by the package as well.
-3. `assess` utilizes the estimated trial participation probabilities to calculate the Tipton **generalizability index.**  
-4. `assess` allows researchers to **"trim" the target population** data set so that the covariate bounds do not exceed those of the trial covariates.  This checks for any violations of the coverage assumption (that the distribution of the covariates in the population are within the bounds of the covariate distributions in the trial), and reports how many individuals in the population would be excluded.
+1. providing a **summary table of covariate means** in the trial and the population, along with absolute standardized mean differences (ASMD) between the two sources of data.
+2. estimating the **probability of trial participation** based on a vector of covariate names and specified method, and summarizes their distribution across the trial and target populations.  For this, logistic regression is the default method, but estimation using Random Forests or Lasso are currently supported by the package as well.
+3. calculating the Tipton **generalizability index** using the estimated probabilities of trial participation. 
+4. **"trimming" the target population** data set so that the covariate bounds do not exceed those of the trial covariates.  This checks for any violations of the coverage assumption (that the distribution of the covariates in the population are within the bounds of the covariate distributions in the trial), and reports how many individuals in the population would be excluded.
 
 ```
 assess(trial = "trial", selection_covariates = covariates, 
