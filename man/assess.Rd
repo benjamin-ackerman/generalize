@@ -39,7 +39,6 @@ assess(trial, selection_covariates, data, selection_method = "lr",
 \item{data}{data used for analysis}
 }
 
-}
 \description{
 Assess the generalizability of a randomized trial to a particular target population
 }
