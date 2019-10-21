@@ -15,5 +15,6 @@ Imports:
     BayesTree,
     randomForest,
     glmnet,
-    magrittr
+    magrittr,
+    caret
 RoxygenNote: 6.0.1
