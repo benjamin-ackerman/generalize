@@ -1,5 +1,7 @@
 # generalize: an R package for estimating population effects from randomized trial data
 
+**VERSION 0.1.1 UPDATE**: The `covariate_table` function now returns rows for *all* levels of factor variables, not excluding a reference level anymore.
+
 Randomized controlled trials (RCTs) are considered the gold standard for estimating the causal effect of a drug or intervention in a study sample. However, while RCTs have strong internal validity, they often have weaker external validity, making it difficult to generalize trial results from a “non-representative” study sample to a broader population. This makes it challenging for policymakers to accurately draw population-level conclusions from trial evidence.
 
 Given increasing concern about potential lack of generalizability of RCT findings, statistical methods have recently been proposed to estimate population average treatment effects by supplementing trial data with target population-level data. The `generalize` R package is designed for researchers to implement these methods, and to better assess and improve upon the generalizability of RCT findings to a well-defined target population.
