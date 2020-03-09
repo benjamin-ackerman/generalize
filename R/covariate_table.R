@@ -54,7 +54,8 @@ covariate_table <- function(trial, selection_covariates, data,
   n_trial = as.numeric(table(expanded.data$trial)["1"])
   n_pop = as.numeric(table(expanded.data$trial)["0"])
 
-  # as per https://www.itl.nist.gov/div898/software/dataplot/refman2/ch2/weighvar.pdf
+  # as per
+  # https://www.itl.nist.gov/div898/software/dataplot/refman2/ch2/weighvar.pdf
   sd.tab = expanded.data %>%
     dplyr::group_by(trial) %>%
     dplyr::summarise_at(names(expanded.data)[which(!names(expanded.data)%in% c("trial","X.Intercept."))],
