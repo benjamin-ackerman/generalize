@@ -5,3 +5,5 @@
 ^\.travis\.yml$
 ^appveyor\.yml$
 ^README\.Rmd$
+^_config\.yml$
+^function_ideas\.md$

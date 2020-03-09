@@ -4,7 +4,15 @@
 \alias{generalize_tmle}
 \title{TMLE for estimating TATE}
 \usage{
-generalize_tmle(outcome, treatment, trial, selection_covariates, data, seed)
+generalize_tmle(
+  outcome,
+  treatment,
+  trial,
+  selection_covariates,
+  data,
+  is_data_disjoint = TRUE,
+  seed
+)
 }
 \arguments{
 \item{outcome}{variable name denoting outcome}
@@ -16,6 +24,8 @@ generalize_tmle(outcome, treatment, trial, selection_covariates, data, seed)
 \item{selection_covariates}{vector of covariate names in data set that predict trial participation}
 
 \item{data}{data frame comprised of "stacked" trial and target population data}
+
+\item{is_data_disjoint}{logical. If TRUE, then trial and population data are considered independent.}
 
 \item{seed}{numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).}
 }

@@ -88,6 +88,7 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
   return(out)
 }
 
+#' @export
 print.generalize_assess <- function(x,...){
   cat("A generalize_assess object: \n")
   cat(paste0(" - probability of trial participation method: ", x$selection_method, "\n"))
@@ -102,6 +103,7 @@ print.generalize_assess <- function(x,...){
   invisible(x)
 }
 
+#' @export
 summary.generalize_assess <- function(object,...){
   selection_method_name = c("Logistic Regression","Random Forests","Lasso")
   selection_method = c("lr","rf","lasso")
@@ -126,6 +128,7 @@ summary.generalize_assess <- function(object,...){
   return(out)
 }
 
+#' @export
 print.summary.generalize_assess <- function(x,...){
   cat("Probability of Trial Participation: \n \n")
   cat(paste0("Selection Model: ",x$selection_formula," \n \n"))

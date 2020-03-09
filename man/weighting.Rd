@@ -4,8 +4,16 @@
 \alias{weighting}
 \title{Estimate weights for generalizing ATE by predicting probability of trial participation}
 \usage{
-weighting(outcome, treatment, trial, selection_covariates, data,
-  selection_method = "lr", is_data_disjoint = TRUE, seed)
+weighting(
+  outcome,
+  treatment,
+  trial,
+  selection_covariates,
+  data,
+  selection_method = "lr",
+  is_data_disjoint = TRUE,
+  seed
+)
 }
 \arguments{
 \item{outcome}{variable name denoting outcome}
