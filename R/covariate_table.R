@@ -3,13 +3,28 @@
 #' @param trial variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)
 #' @param selection_covariates vector of covariate names in data set that predict trial participation
 #' @param data data frame comprised of "stacked" trial and target population data
+#' @param weighted_table should the output be a weighted table?
+#' If \code{TRUE}, then \code{\link{weighting}}
+#' @param selection_method method to estimate the probability of trial
+#' participation.  Default is logistic regression ("lr").
+#' Other methods supported are Random Forests ("rf") and Lasso ("lasso"),
+#' passed to \code{\link{weighting}}
+#' @param is_data_disjoint logical. If TRUE, then trial and population data
+#'  are considered independent.  This affects calculation of the weights -
+#'  see details for more information.
+#' @importFrom dplyr funs
 
-covariate_table <- function(trial, selection_covariates, data, weighted_table = FALSE, selection_method = "lr", is_data_disjoint = TRUE){
+covariate_table <- function(trial, selection_covariates, data,
+                            weighted_table = FALSE,
+                            selection_method = "lr",
+                            is_data_disjoint = TRUE){
+  . = population = pooled_sd = ASMD = NULL
+  rm(list = c( "population", "pooled_sd", "ASMD", "."))
 
+  data = data %>%
+    tidyr::drop_na(selection_covariates) %>%
+    as.data.frame()
   if(weighted_table == FALSE){
-    data = data %>%
-      tidyr::drop_na(selection_covariates) %>%
-      as.data.frame()
 
     dmy <- caret::dummyVars(" ~ .", data = data[,selection_covariates], sep="_")
     expanded.data = data.frame(trial = data[, trial], predict(dmy, newdata = data[,selection_covariates]))
@@ -44,10 +59,6 @@ covariate_table <- function(trial, selection_covariates, data, weighted_table = 
   }
 
   if(weighted_table == TRUE){
-    data = data %>%
-      tidyr::drop_na(selection_covariates) %>%
-      as.data.frame()
-
     data$weights = weighting(outcome = NULL, treatment = NULL, trial = trial,
                              selection_covariates = selection_covariates, data = data,
                              selection_method = selection_method, is_data_disjoint = is_data_disjoint)$weights
@@ -59,7 +70,7 @@ covariate_table <- function(trial, selection_covariates, data, weighted_table = 
 
     means.tab = expanded.data %>%
       dplyr::group_by(trial) %>%
-      dplyr::summarise_at(names(expanded.data)[-1], funs(weighted.mean(., weights))) %>%
+      dplyr::summarise_at(names(expanded.data)[-1], dplyr::funs(weighted.mean(., weights))) %>%
       dplyr::select(-`weights`) %>%
       t() %>%
       as.data.frame()
@@ -75,7 +86,7 @@ covariate_table <- function(trial, selection_covariates, data, weighted_table = 
     sd.tab = expanded.data %>%
       dplyr::group_by(trial) %>%
       dplyr::summarise_at(names(expanded.data)[which(!names(expanded.data)%in% c("trial","X.Intercept."))],
-                          funs(sum(weights * (. - weighted.mean(.,weights))^2)/sum(weights))) %>%
+                          dplyr::funs(sum(weights * (. - weighted.mean(.,weights))^2)/sum(weights))) %>%
       dplyr::select(-`weights`) %>%
       t() %>%
       as.data.frame()

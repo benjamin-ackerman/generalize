@@ -154,6 +154,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   return(out)
 }
 
+#' @export
 print.generalize <- function(x,...){
   cat("A generalize object: \n")
   cat(paste0(" - SATE: ", round(x$SATE$estimate,3), "\n"))
@@ -175,6 +176,7 @@ print.generalize <- function(x,...){
   invisible(x)
 }
 
+#' @export
 summary.generalize <- function(object,...){
   ## put together results table
   result_tab = rbind(unlist(object$SATE), unlist(object$TATE))
@@ -209,6 +211,7 @@ summary.generalize <- function(object,...){
   return(out)
 }
 
+#' @export
 print.summary.generalize <- function(x,...){
   cat("Average Treatment Effect Estimates: \n \n")
   cat(paste0("Outcome Model: ",x$outcome_formula," \n \n"))

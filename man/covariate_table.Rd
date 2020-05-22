@@ -4,8 +4,14 @@
 \alias{covariate_table}
 \title{Create Covariate Balance Table}
 \usage{
-covariate_table(trial, selection_covariates, data, weighted_table = FALSE,
-  selection_method = "lr", is_data_disjoint = TRUE)
+covariate_table(
+  trial,
+  selection_covariates,
+  data,
+  weighted_table = FALSE,
+  selection_method = "lr",
+  is_data_disjoint = TRUE
+)
 }
 \arguments{
 \item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}
@@ -13,6 +19,18 @@ covariate_table(trial, selection_covariates, data, weighted_table = FALSE,
 \item{selection_covariates}{vector of covariate names in data set that predict trial participation}
 
 \item{data}{data frame comprised of "stacked" trial and target population data}
+
+\item{weighted_table}{should the output be a weighted table?
+If \code{TRUE}, then \code{\link{weighting}}}
+
+\item{selection_method}{method to estimate the probability of trial
+participation.  Default is logistic regression ("lr").
+Other methods supported are Random Forests ("rf") and Lasso ("lasso"),
+passed to \code{\link{weighting}}}
+
+\item{is_data_disjoint}{logical. If TRUE, then trial and population data
+are considered independent.  This affects calculation of the weights -
+see details for more information.}
 }
 \description{
 Create Covariate Balance Table

@@ -4,8 +4,15 @@
 \alias{assess}
 \title{Assess Generalizability of Randomized Trial to Population}
 \usage{
-assess(trial, selection_covariates, data, selection_method = "lr",
-  is_data_disjoint = TRUE, trim_pop = FALSE, seed)
+assess(
+  trial,
+  selection_covariates,
+  data,
+  selection_method = "lr",
+  is_data_disjoint = TRUE,
+  trim_pop = FALSE,
+  seed
+)
 }
 \arguments{
 \item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}
@@ -14,31 +21,17 @@ assess(trial, selection_covariates, data, selection_method = "lr",
 
 \item{data}{data frame comprised of "stacked" trial and target population data}
 
-\item{selection_method}{method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods currently supported are Random Forests ("rf") and Lasso ("lasso")}
+\item{selection_method}{method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")}
 
-\item{is_data_disjoint}{logical. If TRUE, then trial and population data are considered disjoint data sources (individuals in trial are not individuals measured in the population dataset)}
+\item{is_data_disjoint}{logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.}
 
-\item{trim_pop}{logical. If TRUE, then population data are subset to exclude individuals with covariates outside the ranges of trial covariates.}
+\item{trim_pop}{logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.}
 
-\item{seed}{numeric. By default, the seed is set to 13783, otherwise can be specified.}
+\item{seed}{numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).}
 }
 \value{
-\code{assess} returns an object of the class "generalize_assess," which is a list containing the following components:
-\item{g_index}{Tipton's Generalizability Index}
-\item{selection_method}{method of estimating the trial participation probabilities}
-\item{selection_covariates}{vector of covariate names}
-\item{trial_name}{name of the trial membership indicator variable}
-\item{n_trial}{trial data sample size}
-\item{n_pop}{population data sample size}
-\item{trim_pop}{logical}
-\item{n_excluded}{if \code{trim_pop} = TRUE, the number of individuals in the population excluded}
-\item{participation_probs}{list of participation probabilities in the trial and population}
-\item{weights}{weights calculated using the participation probabilities}
-\item{covariate_table}{table of covariate distributions in trial and population}
-\item{weighted_covariate_table}{a covariate table by trial participation, where trial covariates are weighted}
-\item{data}{data used for analysis}
+\code{assess} returns an object of the class "generalize_assess"
 }
-
 \description{
-Assess the generalizability of a randomized trial to a particular target population
+Assess Generalizability of Randomized Trial to Population
 }
