@@ -4,15 +4,8 @@
 \alias{generalize_bart}
 \title{BART for estimating TATE}
 \usage{
-generalize_bart(
-  outcome,
-  treatment,
-  trial,
-  selection_covariates,
-  data,
-  is_data_disjoint = TRUE,
-  seed
-)
+generalize_bart(outcome, treatment, trial, selection_covariates, data,
+  is_data_disjoint = TRUE, seed)
 }
 \arguments{
 \item{outcome}{variable name denoting outcome}
