@@ -14,6 +14,7 @@
 #'  see details for more information.
 #' @importFrom dplyr funs
 
+#' @export
 covariate_table <- function(trial, selection_covariates, data,
                             weighted_table = FALSE,
                             selection_method = "lr",

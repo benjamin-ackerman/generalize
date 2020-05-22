@@ -9,6 +9,7 @@
 #' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.
 #' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
 
+#' @export
 weighting = function(outcome, treatment, trial, selection_covariates, data,
                      selection_method = "lr", is_data_disjoint = TRUE,seed){
 

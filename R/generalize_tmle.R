@@ -9,6 +9,7 @@
 #' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
 #' @return \code{generalize_tmle} returns a list of the TATE estimate, standard error, and 95\% CI bounds
 
+#' @export
 generalize_tmle <- function(outcome, treatment, trial, selection_covariates, data,is_data_disjoint = TRUE,seed){
 
   ##### set the seed #####

@@ -4,8 +4,15 @@
 \alias{generalize_tmle}
 \title{TMLE for estimating TATE}
 \usage{
-generalize_tmle(outcome, treatment, trial, selection_covariates, data,
-  is_data_disjoint = TRUE, seed)
+generalize_tmle(
+  outcome,
+  treatment,
+  trial,
+  selection_covariates,
+  data,
+  is_data_disjoint = TRUE,
+  seed
+)
 }
 \arguments{
 \item{outcome}{variable name denoting outcome}

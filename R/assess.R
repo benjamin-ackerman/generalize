@@ -9,6 +9,7 @@
 #' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
 #' @return \code{assess} returns an object of the class "generalize_assess"
 
+#' @export
 assess = function(trial, selection_covariates, data, selection_method = "lr",
                   is_data_disjoint = TRUE, trim_pop = FALSE,seed){
 

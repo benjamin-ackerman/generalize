@@ -4,8 +4,15 @@
 \alias{assess}
 \title{Assess Generalizability of Randomized Trial to Population}
 \usage{
-assess(trial, selection_covariates, data, selection_method = "lr",
-  is_data_disjoint = TRUE, trim_pop = FALSE, seed)
+assess(
+  trial,
+  selection_covariates,
+  data,
+  selection_method = "lr",
+  is_data_disjoint = TRUE,
+  trim_pop = FALSE,
+  seed
+)
 }
 \arguments{
 \item{trial}{variable name denoting binary trial participation (1 = trial participant, 0 = not trial participant)}

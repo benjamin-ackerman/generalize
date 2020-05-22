@@ -4,9 +4,18 @@
 \alias{generalize}
 \title{Generalize Average Treatment Effect from Randomized Trial to Population}
 \usage{
-generalize(outcome, treatment, trial, selection_covariates, data,
-  method = "weighting", selection_method = "lr",
-  is_data_disjoint = TRUE, trim_pop = FALSE, seed)
+generalize(
+  outcome,
+  treatment,
+  trial,
+  selection_covariates,
+  data,
+  method = "weighting",
+  selection_method = "lr",
+  is_data_disjoint = TRUE,
+  trim_pop = FALSE,
+  seed
+)
 }
 \arguments{
 \item{outcome}{variable name denoting outcome}
