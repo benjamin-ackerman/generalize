@@ -82,7 +82,7 @@ covariate_table <- function(trial, selection_covariates, data,
     dplyr::group_by(trial) %>%
     dplyr::summarise_at(names(expanded.data)[which(!names(expanded.data)%in% c("trial","X.Intercept."))],
                         dplyr::funs(sum(weights * (. - weighted.mean(.,weights))^2)/
-                                      (length(weights) - 1) * sum(weights) / length(weights)
+                                      ((length(weights) - 1) * sum(weights) / length(weights))
                                     )) %>%
     dplyr::select(-`weights`) %>%
     t() %>%
