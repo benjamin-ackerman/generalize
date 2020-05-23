@@ -172,6 +172,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     selection_covariates = selection_covariates,
     weighted_covariate_table = weighted_cov_tab,
     data = data_output,
+    survey_weights = (survey_weights != FALSE),
     is_data_disjoint = is_data_disjoint
   )
 
@@ -194,6 +195,9 @@ print.generalize <- function(x,...){
   cat(paste0(" - common covariates included: ", paste(x$selection_covariates, collapse = ", "), "\n"))
   cat(paste0(" - sample size of trial: ", x$n_trial, "\n"))
   cat(paste0(" - size of population: ", x$n_pop, "\n"))
+  if(x$survey_weights == TRUE & x$method == "weighting"){
+    cat(paste0(" - survey weights were included in population data and incorporated into estimation \n"))
+  }
   cat(paste0(" - was population trimmed according to trial covariate bounds?: ", ifelse(x$trimpop == TRUE, "Yes", "No"), "\n"))
   if(x$trimpop == TRUE){
     cat(paste0("    - number excluded from population data: ", x$n_excluded, "\n"))
@@ -224,6 +228,7 @@ summary.generalize <- function(object,...){
     result_tab = result_tab,
     method = method_name[object$method == method],
     selection_method = selection_method_name[object$selection_method == selection_method],
+    survey_weights = object$survey_weights,
     n_trial = object$n_trial,
     n_pop = object$n_pop,
     trimpop = object$trimpop,
@@ -263,6 +268,10 @@ print.summary.generalize <- function(x,...){
     cat("\n")
     cat("Covariate Distributions after Weighting: \n \n")
     print(round(x$weighted_covariate_table,4))
+    if(x$survey_weights == TRUE){
+      cat("\n")
+      cat(paste0("*survey weights were included in population data and incorporated into estimation"))
+    }
   }
 
   invisible(x)

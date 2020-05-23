@@ -92,6 +92,7 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
     n_excluded = n_excluded,
     participation_probs = participation_probs,
     weights = weights,
+    survey_weights = (survey_weights != FALSE),
     covariate_table = cov_tab,
     weighted_covariate_table = weighted_cov_tab,
     data = data_output
@@ -109,6 +110,9 @@ print.generalize_assess <- function(x,...){
   cat(paste0(" - common covariates included: ", paste(x$selection_covariates, collapse = ", "), "\n"))
   cat(paste0(" - sample size of trial: ", x$n_trial, "\n"))
   cat(paste0(" - size of population: ", x$n_pop, "\n"))
+  if(x$survey_weights == TRUE){
+    cat(paste0(" - survey weights were included in population data and incorporated into estimation \n"))
+  }
   cat(paste0(" - was population trimmed according to trial covariate bounds?: ", ifelse(x$trimpop == TRUE, "Yes", "No"), "\n"))
   if(x$trimpop == TRUE){
     cat(paste0("    - number excluded from population data: ", x$n_excluded, "\n"))
@@ -131,6 +135,7 @@ summary.generalize_assess <- function(object,...){
   out = list(
     selection_formula = selection_formula,
     selection_method = selection_method_name[selection_method == object$selection_method],
+    survey_weights = object$survey_weights,
     g_index = round(object$g_index,3),
     prob_dist_table = prob_dist_table,
     covariate_table = round(object$covariate_table, 4),
@@ -158,5 +163,9 @@ print.summary.generalize_assess <- function(x,...){
     cat(paste0("Number excluded from population: ", x$n_excluded ,"\n \n"))
   }
   print(round(x$covariate_table,4))
+  if(x$survey_weights == TRUE){
+    cat("\n")
+    cat(paste0("*survey weights were included in population data and incorporated into estimation"))
+  }
   invisible(x)
 }
