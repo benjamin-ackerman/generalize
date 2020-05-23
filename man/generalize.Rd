@@ -17,7 +17,7 @@ generalize(
   trim_weights = FALSE,
   trim_pctile = 0.97,
   is_data_disjoint = TRUE,
-  trim_pop = FALSE,
+  trimpop = FALSE,
   seed
 )
 }
@@ -46,7 +46,7 @@ generalize(
 
 \item{is_data_disjoint}{logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.}
 
-\item{trim_pop}{logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.}
+\item{trimpop}{logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.}
 
 \item{seed}{numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).}
 }

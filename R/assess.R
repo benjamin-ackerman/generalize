@@ -9,14 +9,14 @@
 #' @param trim_weights logical. If TRUE, then trim the weights to the value specified in `trim_pctile`. Default is FALSE.
 #' @param trim_pctile numeric. If `trim_weights` is TRUE, then specify what percentile weights should be trimmed to. Default is 0.97.
 #' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.
-#' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
+#' @param trimpop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
 #' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
 #' @return \code{assess} returns an object of the class "generalize_assess"
 
 #' @export
 assess = function(trial, selection_covariates, data, selection_method = "lr",
                   sl_library = NULL, survey_weights = FALSE, trim_weights=FALSE, trim_pctile = .97,
-                  is_data_disjoint = TRUE, trim_pop = FALSE,seed){
+                  is_data_disjoint = TRUE, trimpop = FALSE,seed){
 
   ##### make methods lower case #####
   selection_method = tolower(selection_method)
@@ -49,9 +49,9 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
   ##### Clean up data from missing values #####
   #data = data[rownames(na.omit(data[,c(trial,selection_covariates)])),]
 
-  if(trim_pop == FALSE){n_excluded = NULL}
+  if(trimpop == FALSE){n_excluded = NULL}
 
-  if(trim_pop == TRUE){
+  if(trimpop == TRUE){
     n_excluded = trim_pop(trial, selection_covariates, data)$n_excluded
     data = trim_pop(trial, selection_covariates, data)$trimmed_data
   }
@@ -65,7 +65,7 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
   g_index = gen_index(participation_probs$trial, participation_probs$population)
 
   cov_tab = covariate_table(trial = trial, selection_covariates = selection_covariates, data = data,
-                                     weighted_table = FALSE)
+                                     weighted_table = FALSE, survey_weights=survey_weights)
 
   weighted_cov_tab = covariate_table(trial = trial, selection_covariates = selection_covariates, data = data,
                                      weighted_table = TRUE, selection_method = selection_method, sl_library = sl_library, survey_weights=survey_weights,
@@ -88,7 +88,7 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
     trial_name = trial,
     n_trial = n_trial,
     n_pop = n_pop,
-    trim_pop = trim_pop,
+    trimpop = trimpop,
     n_excluded = n_excluded,
     participation_probs = participation_probs,
     weights = weights,
@@ -109,8 +109,8 @@ print.generalize_assess <- function(x,...){
   cat(paste0(" - common covariates included: ", paste(x$selection_covariates, collapse = ", "), "\n"))
   cat(paste0(" - sample size of trial: ", x$n_trial, "\n"))
   cat(paste0(" - size of population: ", x$n_pop, "\n"))
-  cat(paste0(" - was population trimmed according to trial covariate bounds?: ", ifelse(x$trim_pop == TRUE, "Yes", "No"), "\n"))
-  if(x$trim_pop == TRUE){
+  cat(paste0(" - was population trimmed according to trial covariate bounds?: ", ifelse(x$trimpop == TRUE, "Yes", "No"), "\n"))
+  if(x$trimpop == TRUE){
     cat(paste0("    - number excluded from population data: ", x$n_excluded, "\n"))
     }
 
@@ -119,8 +119,9 @@ print.generalize_assess <- function(x,...){
 
 #' @export
 summary.generalize_assess <- function(object,...){
-  selection_method_name = c("Logistic Regression","Random Forests","Lasso")
-  selection_method = c("lr","rf","lasso")
+  selection_method_name = c("Logistic Regression","Random Forests","Lasso","GBM","SuperLearner")
+  selection_method = c("lr","rf","lasso","gbm","super")
+
   prob_dist_table = rbind(summary(object$participation_probs$trial),
                           summary(object$participation_probs$population))
   row.names(prob_dist_table) = paste0(c("Trial","Population"), " (n = ", c(object$n_trial,object$n_pop),")")
@@ -134,7 +135,7 @@ summary.generalize_assess <- function(object,...){
     prob_dist_table = prob_dist_table,
     covariate_table = round(object$covariate_table, 4),
     weighted_covariate_table = round(object$weighted_covariate_table,4),
-    trim_pop = object$trim_pop,
+    trimpop = object$trimpop,
     n_excluded = object$n_excluded
   )
 
@@ -152,7 +153,7 @@ print.summary.generalize_assess <- function(x,...){
   cat(paste0("Generalizability Index: ", round(x$g_index,3), "\n"))
   cat("============================================ \n")
   cat("Covariate Distributions: \n \n")
-  if(x$trim_pop == TRUE){
+  if(x$trimpop == TRUE){
     cat("Population data were trimmed for covariates to not exceed trial covariate bounds \n")
     cat(paste0("Number excluded from population: ", x$n_excluded ,"\n \n"))
   }

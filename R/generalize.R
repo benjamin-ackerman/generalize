@@ -13,13 +13,13 @@
 #' @param trim_weights logical. If TRUE, then trim the weights to the value specified in `trim_pctile`. Default is FALSE.
 #' @param trim_pctile numeric. If `trim_weights` is TRUE, then specify what percentile weights should be trimmed to. Default is 0.97.
 #' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.
-#' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
+#' @param trimpop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
 #' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
 #' @return \code{generalize} returns an object of the class "generalize"
 
 #' @export
 generalize <- function(outcome, treatment, trial, selection_covariates, data, method = "weighting",
-                       selection_method = "lr", sl_library = NULL, survey_weights = FALSE, trim_weights=FALSE, trim_pctile = .97, is_data_disjoint = TRUE, trim_pop = FALSE, seed){
+                       selection_method = "lr", sl_library = NULL, survey_weights = FALSE, trim_weights=FALSE, trim_pctile = .97, is_data_disjoint = TRUE, trimpop = FALSE, seed){
 
   ##### make methods lower case #####
   method = tolower(method)
@@ -27,7 +27,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
 
   ### If using TMLE, must trim target population
   if(method == "tmle"){
-    trim_pop = TRUE
+    trimpop = TRUE
   }
 
   ##### CHECKS #####
@@ -73,7 +73,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   }}
 
   ##### trim population #####
-  if(trim_pop == FALSE){
+  if(trimpop == FALSE){
     n_excluded = NULL
     ## just keep the data we need
     if(survey_weights == FALSE){
@@ -83,7 +83,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     }
   }
 
-  if(trim_pop == TRUE){
+  if(trimpop == TRUE){
     n_excluded = trim_pop(trial, selection_covariates, data)$n_excluded
     data = trim_pop(trial, selection_covariates, data)$trimmed_data
   }
@@ -112,7 +112,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   } else{
     SATE_model = glm(as.formula(paste(outcome,treatment,sep="~")), data = data, family = 'quasibinomial')
     SATE = exp(summary(SATE_model)$coefficients[treatment,"Estimate"])
-    SATE_se = NULL
+    SATE_se = NA
 
     SATE_CI_l = as.numeric(exp(confint(SATE_model)[treatment,]))[1]
     SATE_CI_u = as.numeric(exp(confint(SATE_model)[treatment,]))[2]
@@ -167,7 +167,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     g_index = g_index,
     n_trial = n_trial,
     n_pop = n_pop,
-    trim_pop = trim_pop,
+    trimpop = trimpop,
     n_excluded = n_excluded,
     selection_covariates = selection_covariates,
     weighted_covariate_table = weighted_cov_tab,
@@ -194,8 +194,8 @@ print.generalize <- function(x,...){
   cat(paste0(" - common covariates included: ", paste(x$selection_covariates, collapse = ", "), "\n"))
   cat(paste0(" - sample size of trial: ", x$n_trial, "\n"))
   cat(paste0(" - size of population: ", x$n_pop, "\n"))
-  cat(paste0(" - was population trimmed according to trial covariate bounds?: ", ifelse(x$trim_pop == TRUE, "Yes", "No"), "\n"))
-  if(x$trim_pop == TRUE){
+  cat(paste0(" - was population trimmed according to trial covariate bounds?: ", ifelse(x$trimpop == TRUE, "Yes", "No"), "\n"))
+  if(x$trimpop == TRUE){
     cat(paste0("    - number excluded from population data: ", x$n_excluded, "\n"))
   }
 
@@ -213,8 +213,8 @@ summary.generalize <- function(object,...){
   method_name = c("Weighting", "TMLE", "BART")
   method = c("weighting","tmle","bart")
 
-  selection_method_name = c("Logistic Regression","Random Forests","Lasso")
-  selection_method = c("lr","rf","lasso")
+  selection_method_name = c("Logistic Regression","Random Forests","Lasso","GBM","SuperLearner")
+  selection_method = c("lr","rf","lasso","gbm","super")
 
   ## build outcome formula
   outcome_formula = paste0(object$outcome, " ~ ", object$treatment)
@@ -226,7 +226,7 @@ summary.generalize <- function(object,...){
     selection_method = selection_method_name[object$selection_method == selection_method],
     n_trial = object$n_trial,
     n_pop = object$n_pop,
-    trim_pop = object$trim_pop,
+    trimpop = object$trimpop,
     n_excluded = object$n_excluded,
     g_index = object$g_index,
     weighted_covariate_table = object$weighted_covariate_table
@@ -252,7 +252,7 @@ print.summary.generalize <- function(x,...){
   cat("\n")
   cat(paste0("Trial sample size: ",x$n_trial,"\n"))
   cat(paste0("Population size: ",x$n_pop,"\n"))
-  if(x$trim_pop == TRUE){
+  if(x$trimpop == TRUE){
     cat("Population data were trimmed for covariates to not exceed trial covariate bounds \n")
     cat(paste0("Number excluded from population: ", x$n_excluded ,"\n"))
   }

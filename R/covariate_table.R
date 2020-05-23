@@ -101,8 +101,12 @@ covariate_table <- function(trial, selection_covariates, data,
     dplyr::mutate(ASMD = round(abs((trial - population)/pooled_sd),3)) %>%
     dplyr::select(trial, population, ASMD)
 
+  if(survey_weights != FALSE){
+    names(covariate_table)[which(names(covariate_table) == "population")] = "population (weighted)"
+  }
+
   if(weighted_table == FALSE){
-    row.names(covariate_table) = setdiff(names(expanded.data),c("trial","X.Intercept."))
+    row.names(covariate_table) = setdiff(names(expanded.data),c("trial","X.Intercept.","weights"))
   }
 
   if(weighted_table == TRUE){

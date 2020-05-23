@@ -129,18 +129,18 @@ weighting = function(outcome, treatment, trial, selection_covariates, data,
     ##### ESTIMATE POPULATION AVERAGE TREATMENT EFFECT #####
     formula = as.formula(paste(outcome,treatment,sep="~"))
 
-    ATE_design = survey::svydesign(id = ~1, data = data %>% filter(get(trial) == 1), weights = data$weights[which(data[,trial] == 1)])
+    ATE_design = survey::svydesign(id = ~1, data = data[which(data[,trial] == 1),], weights = data$weights[which(data[,trial] == 1)])
 
     if(length(table(data[,outcome]))!=2){
       model = survey::svyglm(formula, design = ATE_design, family='gaussian')
       TATE = summary(model)$coefficients[treatment,"Estimate"]
-      se = summary(model$coefficients[treatment,"Std. Error"])
+      TATE_se = summary(model$coefficients[treatment,"Std. Error"])
       TATE_CI_l = as.numeric(confint(model)[treatment,])[1]
       TATE_CI_u =as.numeric(confint(model)[treatment,])[2]
     } else{
       model = survey::svyglm(formula, design = ATE_design, family='quasibinomial')
       TATE = exp(summary(model)$coefficients[treatment,"Estimate"])
-      se = NULL
+      TATE_se = NA
       TATE_CI_l = as.numeric(exp(confint(model)[treatment,]))[1]
       TATE_CI_u = as.numeric(exp(confint(model)[treatment,]))[2]
     }
