@@ -100,7 +100,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
 
   formula = as.formula(paste(outcome,treatment,sep="~"))
 
-  ATE_design = survey::svydesign(id = ~1, data = data %>% dplyr::filter(get(trial) == 1), weights = data$weights[which(data[,trial] == 1)])
+  ATE_design = survey::svydesign(id = ~1, data = data[which(data[,trial] == 1),], weights = data$weights[which(data[,trial] == 1)])
 
   if(length(table(data[,outcome]))!=2){
     SATE_model = lm(as.formula(paste(outcome,treatment,sep="~")), data = data)
