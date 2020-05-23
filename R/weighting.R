@@ -7,7 +7,7 @@
 #' @param data data frame comprised of "stacked" trial and target population data
 #' @param selection_method method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf"), Lasso ("lasso"), GBM ("gbm") and SuperLearner ("super").
 #' @param sl_library vector of SuperLearner library methods. If `selection_method` = 'super', specify names of methods to include in library. Default is NULL.
-#' @param survey_weights variable name of population data's complex survey weights. Default is FALSE: if FALSE, then population data do not come a complex survey and weights do not need to be incorporated in estimation.
+#' @param survey_weights variable name of population data's complex survey weights. Default is FALSE: if FALSE, then population data do not come a complex survey and weights do not need to be incorporated in estimation. NOTE: SURVEY WEIGHTS ONLY SUPPORTED FOR USE WHEN USING WEIGHTING METHODS FOR THE TIME BEING. Survey weights will not be incorporated in BART or TMLE.
 #' @param trim_weights logical. If TRUE, then trim the weights to the value specified in `trim_pctile`. Default is FALSE.
 #' @param trim_pctile numeric. If `trim_weights` is TRUE, then specify what percentile weights should be trimmed to. Default is 0.97.
 #' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.

@@ -34,7 +34,7 @@ weighting(
 
 \item{sl_library}{vector of SuperLearner library methods. If `selection_method` = 'super', specify names of methods to include in library. Default is NULL.}
 
-\item{survey_weights}{variable name of population data's complex survey weights. Default is FALSE: if FALSE, then population data do not come a complex survey and weights do not need to be incorporated in estimation.}
+\item{survey_weights}{variable name of population data's complex survey weights. Default is FALSE: if FALSE, then population data do not come a complex survey and weights do not need to be incorporated in estimation. NOTE: SURVEY WEIGHTS ONLY SUPPORTED FOR USE WHEN USING WEIGHTING METHODS FOR THE TIME BEING. Survey weights will not be incorporated in BART or TMLE.}
 
 \item{trim_weights}{logical. If TRUE, then trim the weights to the value specified in `trim_pctile`. Default is FALSE.}
 
