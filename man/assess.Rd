@@ -9,6 +9,10 @@ assess(
   selection_covariates,
   data,
   selection_method = "lr",
+  sl_library = NULL,
+  survey_weights = FALSE,
+  trim_weights = FALSE,
+  trim_pctile = 0.97,
   is_data_disjoint = TRUE,
   trim_pop = FALSE,
   seed
@@ -22,6 +26,14 @@ assess(
 \item{data}{data frame comprised of "stacked" trial and target population data}
 
 \item{selection_method}{method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")}
+
+\item{sl_library}{vector of SuperLearner library methods. If `selection_method` = 'super', specify names of methods to include in library. Default is NULL.}
+
+\item{survey_weights}{variable name of population data's complex survey weights. Default is FALSE: if FALSE, then population data do not come a complex survey and weights do not need to be incorporated in estimation.}
+
+\item{trim_weights}{logical. If TRUE, then trim the weights to the value specified in `trim_pctile`. Default is FALSE.}
+
+\item{trim_pctile}{numeric. If `trim_weights` is TRUE, then specify what percentile weights should be trimmed to. Default is 0.97.}
 
 \item{is_data_disjoint}{logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.}
 

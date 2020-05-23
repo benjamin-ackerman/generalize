@@ -4,6 +4,10 @@
 #' @param selection_covariates vector of covariate names in data set that predict trial participation
 #' @param data data frame comprised of "stacked" trial and target population data
 #' @param selection_method method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")
+#' @param sl_library vector of SuperLearner library methods. If `selection_method` = 'super', specify names of methods to include in library. Default is NULL.
+#' @param survey_weights variable name of population data's complex survey weights. Default is FALSE: if FALSE, then population data do not come a complex survey and weights do not need to be incorporated in estimation.
+#' @param trim_weights logical. If TRUE, then trim the weights to the value specified in `trim_pctile`. Default is FALSE.
+#' @param trim_pctile numeric. If `trim_weights` is TRUE, then specify what percentile weights should be trimmed to. Default is 0.97.
 #' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.
 #' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
 #' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
@@ -11,6 +15,7 @@
 
 #' @export
 assess = function(trial, selection_covariates, data, selection_method = "lr",
+                  sl_library = NULL, survey_weights = FALSE, trim_weights=FALSE, trim_pctile = .97,
                   is_data_disjoint = TRUE, trim_pop = FALSE,seed){
 
   ##### make methods lower case #####
@@ -33,7 +38,7 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
     stop("Sample Membership variable must be coded as `0` (not in trial) or `1` (in trial)",call. = FALSE)
   }
 
-  if(!selection_method %in% c("lr","rf","lasso")){
+  if(!selection_method %in% c("lr","rf","lasso","gbm","super")){
     stop("Invalid weighting method!",call. = FALSE)
   }
 
@@ -51,22 +56,30 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
     data = trim_pop(trial, selection_covariates, data)$trimmed_data
   }
 
-  weight_object = weighting(outcome = NULL, treatment = NULL, trial, selection_covariates, data,
-                               selection_method, is_data_disjoint,seed)
+  weight_object = weighting(outcome=NULL, treatment=NULL, trial, selection_covariates, data, selection_method, sl_library,
+                            survey_weights, trim_weights, trim_pctile, is_data_disjoint,seed)
 
   participation_probs = weight_object$participation_probs
   weights = weight_object$weights
 
   g_index = gen_index(participation_probs$trial, participation_probs$population)
 
-  cov_tab = covariate_table(trial, selection_covariates, data)
-  weighted_cov_tab = covariate_table(trial, selection_covariates, data,weighted_table = TRUE)
+  cov_tab = covariate_table(trial = trial, selection_covariates = selection_covariates, data = data,
+                                     weighted_table = FALSE)
+
+  weighted_cov_tab = covariate_table(trial = trial, selection_covariates = selection_covariates, data = data,
+                                     weighted_table = TRUE, selection_method = selection_method, sl_library = sl_library, survey_weights=survey_weights,
+                                     trim_weights=trim_weights, trim_pctile=trim_pctile,is_data_disjoint = is_data_disjoint)
 
 
   n_trial = nrow(data[which(data[,trial] == 1),])
   n_pop = nrow(data[which(data[,trial] == 0),])
 
-  data_output = data[,c(trial, selection_covariates)]
+  if(survey_weights == FALSE){
+    data_output = data[,c(trial, selection_covariates)]
+  } else{
+    data_output = data[,c(trial, selection_covariates,survey_weights)]
+  }
 
   out = list(
     g_index = g_index,

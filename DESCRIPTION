@@ -20,5 +20,7 @@ Imports:
     caret,
     stringr,
     tidyr,
-    stats
+    stats,
+    WeightIt,
+    survey
 RoxygenNote: 7.1.0

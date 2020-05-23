@@ -9,6 +9,7 @@
 #' participation.  Default is logistic regression ("lr").
 #' Other methods supported are Random Forests ("rf") and Lasso ("lasso"),
 #' passed to \code{\link{weighting}}
+#' @param sl_library vector of SuperLearner library methods. If `selection_method` = 'super', specify names of methods to include in library. Default is NULL.
 #' @param survey_weights variable name of population data's complex survey weights. Default is \code{FALSE}: if \code{FALSE}, then population data do not come a complex survey and weights do not need to be incorporated in estimation.
 #' @param trim_weights logical. If \code{TRUE}, then trim the weights to the value specified in `trim_pctile`. Default is \code{FALSE}.
 #' @param trim_pctile numeric. If `trim_weights` is \code{TRUE}, then specify what percentile weights should be trimmed to. Default is 0.97.
@@ -21,6 +22,7 @@
 covariate_table <- function(trial, selection_covariates, data,
                             weighted_table = FALSE,
                             selection_method = "lr",
+                            sl_library = NULL,
                             survey_weights = FALSE,
                             trim_weights=FALSE,
                             trim_pctile = .97,
@@ -42,6 +44,7 @@ covariate_table <- function(trial, selection_covariates, data,
     data$weights = weighting(outcome = NULL, treatment = NULL, trial = trial,
                              selection_covariates = selection_covariates, data = data,
                              selection_method = selection_method,
+                             sl_library = sl_library,
                              survey_weights=survey_weights,
                              trim_weights=trim_weights,
                              trim_pctile=trim_pctile,

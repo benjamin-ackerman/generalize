@@ -8,6 +8,10 @@
 #' @param data data frame comprised of "stacked" trial and target population data
 #' @param method method to generalize average treatment effect to the target population.  Default is "weighting" (weighting by participation probability).  Other methods supported are "BART" (Bayesian Additive Regression Trees - NOT READY YET) and "TMLE" (Targeted Maximum Likelihood Estimation)
 #' @param selection_method method to estimate the probability of trial participation.  Default is logistic regression ("lr").  Other methods supported are Random Forests ("rf") and Lasso ("lasso")
+#' @param sl_library vector of SuperLearner library methods. If `selection_method` = 'super', specify names of methods to include in library. Default is NULL.
+#' @param survey_weights variable name of population data's complex survey weights. Default is FALSE: if FALSE, then population data do not come a complex survey and weights do not need to be incorporated in estimation.
+#' @param trim_weights logical. If TRUE, then trim the weights to the value specified in `trim_pctile`. Default is FALSE.
+#' @param trim_pctile numeric. If `trim_weights` is TRUE, then specify what percentile weights should be trimmed to. Default is 0.97.
 #' @param is_data_disjoint logical. If TRUE, then trial and population data are considered independent.  This affects calculation of the weights - see details for more information.
 #' @param trim_pop logical. If TRUE, then population data are subset to exclude individuals with covariates outside bounds of trial covariates.
 #' @param seed numeric. By default, the seed is set to 13783, otherwise can be specified (such as for simulation purposes).
@@ -15,7 +19,7 @@
 
 #' @export
 generalize <- function(outcome, treatment, trial, selection_covariates, data, method = "weighting",
-                       selection_method = "lr", is_data_disjoint = TRUE, trim_pop = FALSE, seed){
+                       selection_method = "lr", sl_library = NULL, survey_weights = FALSE, trim_weights=FALSE, trim_pctile = .97, is_data_disjoint = TRUE, trim_pop = FALSE, seed){
 
   ##### make methods lower case #####
   method = tolower(method)
@@ -59,7 +63,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     stop("Invalid method!",call. = FALSE)
   }
 
-  if(!selection_method %in% c("lr","rf","lasso")){
+  if(!selection_method %in% c("lr","rf","lasso","gbm","super")){
     stop("Invalid weighting method!",call. = FALSE)
   }
 
@@ -72,7 +76,11 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   if(trim_pop == FALSE){
     n_excluded = NULL
     ## just keep the data we need
-    data = data[rownames(na.omit(data[,c(trial,selection_covariates)])),c(outcome, treatment, trial, selection_covariates)]
+    if(survey_weights == FALSE){
+      data = data[rownames(na.omit(data[,c(trial,selection_covariates)])),c(outcome, treatment, trial, selection_covariates)]
+    } else{
+      data = data[rownames(na.omit(data[,c(trial,selection_covariates)])),c(outcome, treatment, trial, survey_weights, selection_covariates)]
+    }
   }
 
   if(trim_pop == TRUE){
@@ -81,7 +89,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   }
 
   ##### Weighting object for diagnostics #####
-  weight_object = weighting(outcome, treatment, trial, selection_covariates, data, selection_method, is_data_disjoint,seed)
+  weight_object = weighting(outcome, treatment, trial, selection_covariates, data, selection_method, sl_library, survey_weights, trim_weights, trim_pctile, is_data_disjoint,seed)
 
   participation_probs = weight_object$participation_probs
   weights = weight_object$weights
@@ -89,14 +97,26 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
 
   ##### Generalize results #####
   ## First, estimate SATE
-  SATE_model = lm(as.formula(paste(outcome,treatment,sep="~")), data = data)
 
-  SATE = summary(SATE_model)$coefficients[treatment, "Estimate"]
-  SATE_se = summary(SATE_model)$coefficients[treatment, "Std. Error"]
+  formula = as.formula(paste(outcome,treatment,sep="~"))
 
-  SATE_CI_l = SATE - 1.96*SATE_se
-  SATE_CI_u = SATE + 1.96*SATE_se
+  ATE_design = survey::svydesign(id = ~1, data = data %>% filter(get(trial) == 1), weights = data$weights[which(data[,trial] == 1)])
 
+  if(length(table(data[,outcome]))!=2){
+    SATE_model = lm(as.formula(paste(outcome,treatment,sep="~")), data = data)
+    SATE = summary(SATE_model)$coefficients[treatment, "Estimate"]
+    SATE_se = summary(SATE_model)$coefficients[treatment, "Std. Error"]
+
+    SATE_CI_l = SATE - 1.96*SATE_se
+    SATE_CI_u = SATE + 1.96*SATE_se
+  } else{
+    SATE_model = glm(as.formula(paste(outcome,treatment,sep="~")), data = data, family = 'quasibinomial')
+    SATE = exp(summary(SATE_model)$coefficients[treatment,"Estimate"])
+    SATE_se = NULL
+
+    SATE_CI_l = as.numeric(exp(confint(SATE_model)[treatment,]))[1]
+    SATE_CI_u = as.numeric(exp(confint(SATE_model)[treatment,]))[2]
+  }
   SATE_results = list(estimate = SATE,
                       se = SATE_se,
                       CI_l = SATE_CI_l,
@@ -125,10 +145,15 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
   weighted_cov_tab = NULL
   if(method == "weighting"){
   weighted_cov_tab = covariate_table(trial = trial, selection_covariates = selection_covariates, data = data,
-                            weighted_table = TRUE, selection_method = selection_method, is_data_disjoint = is_data_disjoint)
+                            weighted_table = TRUE, selection_method = selection_method, sl_library = sl_library, survey_weights=survey_weights,
+                            trim_weights=trim_weights, trim_pctile=trim_pctile,is_data_disjoint = is_data_disjoint)
   }
 
-  data_output = data[,c(outcome, treatment, trial, selection_covariates)]
+  if(survey_weights == FALSE){
+    data_output = data[,c(outcome, treatment, trial, selection_covariates)]
+  } else{
+    data_output = data[,c(outcome, treatment, trial, selection_covariates,survey_weights)]
+  }
 
   ##### Items to save to "generalize" object #####
   out = list(
