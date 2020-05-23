@@ -62,6 +62,10 @@ weighting = function(outcome, treatment, trial, selection_covariates, data,
     data = data[rownames(na.omit(data[,c(trial,selection_covariates)])),c(outcome, treatment, trial, survey_weights, selection_covariates)]
     data$s_weights = ifelse(data[,trial] == 1, 1, data[,survey_weights])
 
+    ### NORMALIZE THE SURVEY WEIGHTS TO SUM TO THE NUMBER OF SURVEY PARTICIPANTS:
+    normalize_factor = mean(data$s_weights[which(data[,trial] == 0)], na.rm = TRUE)
+    data$s_weights[which(data[,trial] == 0)] = data$s_weights[which(data[,trial] == 0)]/normalize_factor
+
     if(selection_method == "rf"){
       data = data %>%
         dplyr::filter(get(trial) == 0) %>%

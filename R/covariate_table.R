@@ -38,6 +38,10 @@ covariate_table <- function(trial, selection_covariates, data,
     data$s_weights = 1
   } else{
     data$s_weights = ifelse(data[,trial] == 1, 1, data[,survey_weights])
+
+    ### NORMALIZE THE SURVEY WEIGHTS TO SUM TO THE NUMBER OF SURVEY PARTICIPANTS:
+    normalize_factor = mean(data$s_weights[which(data[,trial] == 0)], na.rm = TRUE)
+    data$s_weights[which(data[,trial] == 0)] = data$s_weights[which(data[,trial] == 0)]/normalize_factor
   }
 
   if(weighted_table == TRUE){
