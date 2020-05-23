@@ -1,5 +1,3 @@
-generalize: an R package for estimating population effects from randomized trial data
-================
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <!-- badges: start -->
