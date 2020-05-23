@@ -1,7 +1,7 @@
 Package: generalize
 Type: Package
 Title: Generalizing Average Treatment Effects from RCTs to Target Populations
-Version: 0.1.1
+Version: 0.1.2
 Author: Benjamin Ackerman
 Maintainer: Benjamin Ackerman <backer10@jhu.edu>
 Description: This package allows you to assess and improve upon 
