@@ -9,7 +9,10 @@
 #' participation.  Default is logistic regression ("lr").
 #' Other methods supported are Random Forests ("rf") and Lasso ("lasso"),
 #' passed to \code{\link{weighting}}
-#' @param is_data_disjoint logical. If TRUE, then trial and population data
+#' @param survey_weights variable name of population data's complex survey weights. Default is \code{FALSE}: if \code{FALSE}, then population data do not come a complex survey and weights do not need to be incorporated in estimation.
+#' @param trim_weights logical. If \code{TRUE}, then trim the weights to the value specified in `trim_pctile`. Default is \code{FALSE}.
+#' @param trim_pctile numeric. If `trim_weights` is \code{TRUE}, then specify what percentile weights should be trimmed to. Default is 0.97.
+#' @param is_data_disjoint logical. If \code{TRUE}, then trial and population data
 #'  are considered independent.  This affects calculation of the weights -
 #'  see details for more information.
 #' @importFrom dplyr funs
@@ -18,6 +21,9 @@
 covariate_table <- function(trial, selection_covariates, data,
                             weighted_table = FALSE,
                             selection_method = "lr",
+                            survey_weights = FALSE,
+                            trim_weights=FALSE,
+                            trim_pctile = .97,
                             is_data_disjoint = TRUE){
   . = population = pooled_sd = ASMD = NULL
   rm(list = c( "population", "pooled_sd", "ASMD", "."))
@@ -25,13 +31,25 @@ covariate_table <- function(trial, selection_covariates, data,
   data = data %>%
     tidyr::drop_na(selection_covariates) %>%
     as.data.frame()
+
+  if(survey_weights == FALSE){
+    data$s_weights = 1
+  } else{
+    data$s_weights = ifelse(data[,trial] == 1, 1, data[,survey_weights])
+  }
+
   if(weighted_table == TRUE){
     data$weights = weighting(outcome = NULL, treatment = NULL, trial = trial,
                              selection_covariates = selection_covariates, data = data,
-                             selection_method = selection_method, is_data_disjoint = is_data_disjoint)$weights
-    data$weights = ifelse(data[,trial] == 0, 1, data$weights)
+                             selection_method = selection_method,
+                             survey_weights=survey_weights,
+                             trim_weights=trim_weights,
+                             trim_pctile=trim_pctile,
+                             is_data_disjoint = is_data_disjoint)$weights
+
+    data$weights = ifelse(data[,trial] == 0, data$s_weights, data$weights)
   } else {
-    data$weights = 1
+    data$weights = data$s_weights
   }
 
   dmy <- caret::dummyVars(" ~ .", data = data[,selection_covariates], sep="_")
