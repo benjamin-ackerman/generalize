@@ -80,7 +80,7 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
     n_pop_eff = NA
   } else{
     data_output = data[,c(trial, selection_covariates,survey_weights)]
-    n_pop_eff = sum(data[which(data[,trial]==0),survey_weights], na.rm=TRUE)
+    n_pop_eff = ceiling(sum(data[which(data[,trial]==0),survey_weights], na.rm=TRUE))
   }
 
 

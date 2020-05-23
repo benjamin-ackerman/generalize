@@ -154,7 +154,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     n_pop_eff = NA
   } else{
     data_output = data[,c(outcome, treatment, trial, selection_covariates,survey_weights)]
-    n_pop_eff = sum(data[which(data[,trial]==0),survey_weights], na.rm = TRUE)
+    n_pop_eff = ceiling(sum(data[which(data[,trial]==0),survey_weights], na.rm = TRUE))
   }
 
   ##### Items to save to "generalize" object #####
@@ -265,7 +265,6 @@ print.summary.generalize <- function(x,...){
   cat(paste0("Trial sample size: ",x$n_trial,"\n"))
   cat(paste0("Population size: ",x$n_pop,"\n"))
   if(x$survey_weights == TRUE){
-    cat("\n")
     cat(paste0(" - Effective population size (accounting for survey weights): ",x$n_pop_eff,"\n"))
   }
   if(x$trimpop == TRUE){
