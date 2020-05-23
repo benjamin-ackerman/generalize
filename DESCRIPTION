@@ -6,7 +6,7 @@ Author: Benjamin Ackerman
 Maintainer: Benjamin Ackerman <backer10@jhu.edu>
 Description: This package allows you to assess and improve upon 
     the generalizability of randomized trials.
-License: No License
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
