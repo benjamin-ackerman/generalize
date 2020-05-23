@@ -134,7 +134,7 @@ weighting = function(outcome, treatment, trial, selection_covariates, data,
     if(length(table(data[,outcome]))!=2){
       model = survey::svyglm(formula, design = ATE_design, family='gaussian')
       TATE = summary(model)$coefficients[treatment,"Estimate"]
-      TATE_se = summary(model$coefficients[treatment,"Std. Error"])
+      TATE_se = summary(model)$coefficients[treatment,"Std. Error"]
       TATE_CI_l = as.numeric(confint(model)[treatment,])[1]
       TATE_CI_u =as.numeric(confint(model)[treatment,])[2]
     } else{
