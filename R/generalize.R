@@ -154,7 +154,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     n_pop_eff = NA
   } else{
     data_output = data[,c(outcome, treatment, trial, selection_covariates,survey_weights)]
-    n_pop_eff = sum(data[which(data[,trial]==0),survey_weights])
+    n_pop_eff = sum(data[which(data[,trial]==0),survey_weights], na.rm = TRUE)
   }
 
   ##### Items to save to "generalize" object #####
