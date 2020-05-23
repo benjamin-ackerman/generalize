@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# generalize: an R package for estimating population effects from randomized trial data
+## generalize: an R package for estimating population effects from randomized trial data
 
 <!-- badges: start -->
 [![Travis build status](https://travis-ci.com/benjamin-ackerman/generalize.svg?branch=master)](https://travis-ci.com/benjamin-ackerman/generalize)

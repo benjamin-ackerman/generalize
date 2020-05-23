@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 generalize: an R package for estimating population effects from randomized trial data
-=====================================================================================
+-------------------------------------------------------------------------------------
 
 <!-- badges: start -->
 [![Travis build status](https://travis-ci.com/benjamin-ackerman/generalize.svg?branch=master)](https://travis-ci.com/benjamin-ackerman/generalize) [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/benjamin-ackerman/generalize?branch=master&svg=true)](https://ci.appveyor.com/project/benjamin-ackerman/generalize) <!-- badges: end -->
