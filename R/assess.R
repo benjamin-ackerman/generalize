@@ -77,9 +77,12 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
 
   if(survey_weights == FALSE){
     data_output = data[,c(trial, selection_covariates)]
+    n_pop_eff = NA
   } else{
     data_output = data[,c(trial, selection_covariates,survey_weights)]
+    n_pop_eff = sum(data[which(data[,trial]==0),survey_weights])
   }
+
 
   out = list(
     g_index = g_index,
@@ -88,6 +91,7 @@ assess = function(trial, selection_covariates, data, selection_method = "lr",
     trial_name = trial,
     n_trial = n_trial,
     n_pop = n_pop,
+    n_pop_eff = n_pop_eff,
     trimpop = trimpop,
     n_excluded = n_excluded,
     participation_probs = participation_probs,
@@ -111,7 +115,7 @@ print.generalize_assess <- function(x,...){
   cat(paste0(" - sample size of trial: ", x$n_trial, "\n"))
   cat(paste0(" - size of population: ", x$n_pop, "\n"))
   if(x$survey_weights == TRUE){
-    cat(paste0(" - survey weights were included in population data and incorporated into estimation \n"))
+    cat(paste0(" - size of effective population (accounting for survey weights): ",x$n_pop_eff,"\n"))
   }
   cat(paste0(" - was population trimmed according to trial covariate bounds?: ", ifelse(x$trimpop == TRUE, "Yes", "No"), "\n"))
   if(x$trimpop == TRUE){
@@ -136,6 +140,7 @@ summary.generalize_assess <- function(object,...){
     selection_formula = selection_formula,
     selection_method = selection_method_name[selection_method == object$selection_method],
     survey_weights = object$survey_weights,
+    n_pop_eff = object$n_pop_eff,
     g_index = round(object$g_index,3),
     prob_dist_table = prob_dist_table,
     covariate_table = round(object$covariate_table, 4),
@@ -154,6 +159,10 @@ print.summary.generalize_assess <- function(x,...){
   cat(paste0("Selection Model: ",x$selection_formula," \n \n"))
   print(x$prob_dist_table)
   cat("\n")
+  if(x$survey_weights == TRUE){
+    cat(paste0(" - Effective population size (accounting for survey weights): ",x$n_pop_eff,"\n"))
+    cat("\n")
+  }
   cat(paste0("Estimated by ",x$selection_method, "\n"))
   cat(paste0("Generalizability Index: ", round(x$g_index,3), "\n"))
   cat("============================================ \n")
@@ -163,9 +172,5 @@ print.summary.generalize_assess <- function(x,...){
     cat(paste0("Number excluded from population: ", x$n_excluded ,"\n \n"))
   }
   print(round(x$covariate_table,4))
-  if(x$survey_weights == TRUE){
-    cat("\n")
-    cat(paste0("*survey weights were included in population data and incorporated into estimation"))
-  }
   invisible(x)
 }

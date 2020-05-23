@@ -151,8 +151,10 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
 
   if(survey_weights == FALSE){
     data_output = data[,c(outcome, treatment, trial, selection_covariates)]
+    n_pop_eff = NA
   } else{
     data_output = data[,c(outcome, treatment, trial, selection_covariates,survey_weights)]
+    n_pop_eff = sum(data[which(data[,trial]==0),survey_weights])
   }
 
   ##### Items to save to "generalize" object #####
@@ -167,6 +169,7 @@ generalize <- function(outcome, treatment, trial, selection_covariates, data, me
     g_index = g_index,
     n_trial = n_trial,
     n_pop = n_pop,
+    n_pop_eff = n_pop_eff,
     trimpop = trimpop,
     n_excluded = n_excluded,
     selection_covariates = selection_covariates,
@@ -195,8 +198,11 @@ print.generalize <- function(x,...){
   cat(paste0(" - common covariates included: ", paste(x$selection_covariates, collapse = ", "), "\n"))
   cat(paste0(" - sample size of trial: ", x$n_trial, "\n"))
   cat(paste0(" - size of population: ", x$n_pop, "\n"))
-  if(x$survey_weights == TRUE & x$method == "weighting"){
-    cat(paste0(" - survey weights were included in population data and incorporated into estimation \n"))
+  if(x$survey_weights == TRUE){
+    cat(paste0(" - size of effective population (accounting for survey weights): ",x$n_pop_eff,"\n"))
+    if(x$method == "weighting"){
+      cat(paste0(" - survey weights were included in population data and incorporated into estimation \n"))
+    }
   }
   cat(paste0(" - was population trimmed according to trial covariate bounds?: ", ifelse(x$trimpop == TRUE, "Yes", "No"), "\n"))
   if(x$trimpop == TRUE){
@@ -231,6 +237,7 @@ summary.generalize <- function(object,...){
     survey_weights = object$survey_weights,
     n_trial = object$n_trial,
     n_pop = object$n_pop,
+    n_pop_eff = object$n_pop_eff,
     trimpop = object$trimpop,
     n_excluded = object$n_excluded,
     g_index = object$g_index,
@@ -257,6 +264,10 @@ print.summary.generalize <- function(x,...){
   cat("\n")
   cat(paste0("Trial sample size: ",x$n_trial,"\n"))
   cat(paste0("Population size: ",x$n_pop,"\n"))
+  if(x$survey_weights == TRUE){
+    cat("\n")
+    cat(paste0(" - Effective population size (accounting for survey weights): ",x$n_pop_eff,"\n"))
+  }
   if(x$trimpop == TRUE){
     cat("Population data were trimmed for covariates to not exceed trial covariate bounds \n")
     cat(paste0("Number excluded from population: ", x$n_excluded ,"\n"))
@@ -268,10 +279,6 @@ print.summary.generalize <- function(x,...){
     cat("\n")
     cat("Covariate Distributions after Weighting: \n \n")
     print(round(x$weighted_covariate_table,4))
-    if(x$survey_weights == TRUE){
-      cat("\n")
-      cat(paste0("*survey weights were included in population data and incorporated into estimation"))
-    }
   }
 
   invisible(x)
