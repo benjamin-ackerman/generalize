@@ -21,6 +21,8 @@ For more information on how survey weights are incorporated when using generaliz
 
 > Ackerman, Lesko, C.R., Siddique, J., Susukida, R., Stuart, E.A. (2020). ["Generalizing randomized trial findings to a target population using complex survey population data"](https://arxiv.org/abs/2003.07500). Under Review.
 
+**VERSION 0.1.3 UPDATE**: Fixed logistic regression weighting `focal` parameter settings.
+
 Installation
 ------------
 
