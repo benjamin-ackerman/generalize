@@ -82,7 +82,7 @@ weighting = function(outcome, treatment, trial, selection_covariates, data,
 
     formula = as.formula(paste(trial, paste(selection_covariates,collapse="+"),sep="~"))
     ps = WeightIt::weightit(formula, data = data, method = selection_method,
-                  estimand="ATT",focal="0",s.weights = data$s_weights,
+                  estimand="ATT",focal="1",s.weights = data$s_weights,
                   stop.method="ks.mean",#gbm parameters
                   SL.library = sl_library)$ps #superlearner parameters
   }
