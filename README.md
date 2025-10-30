@@ -15,11 +15,11 @@ Given increasing concern about potential lack of generalizability of RCT finding
 
 More details on the statistical methods can be found in this paper:
 
-> Ackerman, B., Schmid, I., Rudolph, K. E., Seamans, M. J., Susukida, R., Mojtabai, R., Stuart, E.A. (2018). ["Implementing statistical methods for generalizing randomized trial findings to a target population"](https://www.sciencedirect.com/science/article/abs/pii/S0306460318312309?via%3Dihub). Addictive Behaviors, In Press.
+> Ackerman, B., Schmid, I., Rudolph, K. E., Seamans, M. J., Susukida, R., Mojtabai, R., Stuart, E.A. (2018). ["Implementing statistical methods for generalizing randomized trial findings to a target population"](https://www.sciencedirect.com/science/article/abs/pii/S0306460318312309?via%3Dihub). Addictive Behaviors.
 
 For more information on how survey weights are incorporated when using generalizability weighting methods to estimate the TATE, see this paper:
 
-> Ackerman, Lesko, C.R., Siddique, J., Susukida, R., Stuart, E.A. (2020). ["Generalizing randomized trial findings to a target population using complex survey population data"](https://arxiv.org/abs/2003.07500). Under Review.
+> Ackerman, Lesko, C.R., Siddique, J., Susukida, R., Stuart, E.A. (2020). ["Generalizing randomized trial findings to a target population using complex survey population data"](https://doi.org/10.1002/sim.8822). Statistics in Medicine.
 
 **VERSION 0.1.3 UPDATE**: Fixed logistic regression weighting `focal` parameter settings.
 
